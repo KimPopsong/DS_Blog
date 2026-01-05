@@ -1,0 +1,179 @@
+/*
+  The CSS in this style tag is based off of Bear Blog's default CSS.
+  https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
+  License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
+ */
+
+:root {
+	/* 다크 모드 전용 색상 팔레트 */
+	--accent: #4f8cff;
+	--accent-glow: #6ba3ff;
+	--accent-dark: #1b4bb8;
+	/* 텍스트 계열은 밝게, 배경은 어둡게 사용 */
+	--black: 245, 247, 250; /* 기본 텍스트 색 (밝은 회색에 가까운 흰색) */
+	--gray-dark: 200, 205, 215; /* 본문 텍스트 */
+	--gray: 130, 145, 170; /* 서브 텍스트 */
+	--gray-light: 55, 65, 85; /* 경계선, 코드 블록 배경 등 */
+	--gray-gradient: #050814, #050814;
+	--box-shadow:
+		0 2px 6px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.55),
+		0 16px 32px rgba(0, 0, 0, 0.7);
+	--neon-glow: 0 0 10px rgba(79, 140, 255, 0.3), 0 0 20px rgba(79, 140, 255, 0.2),
+		0 0 30px rgba(79, 140, 255, 0.1);
+	--card-bg: rgba(15, 20, 35, 0.6);
+	--card-border: rgba(79, 140, 255, 0.2);
+}
+@font-face {
+	font-family: "Atkinson";
+	src: url("/fonts/atkinson-regular.woff") format("woff");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Atkinson";
+	src: url("/fonts/atkinson-bold.woff") format("woff");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+body {
+	font-family: "Atkinson", sans-serif;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	background: #050814;
+	background-image: 
+		radial-gradient(circle at 20% 50%, rgba(79, 140, 255, 0.05) 0%, transparent 50%),
+		radial-gradient(circle at 80% 80%, rgba(79, 140, 255, 0.03) 0%, transparent 50%);
+	background-size: 100% 100%;
+	background-attachment: fixed;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	color: rgb(var(--gray-dark));
+	font-size: 20px;
+	line-height: 1.7;
+	min-height: 100vh;
+}
+main {
+	width: 720px;
+	max-width: calc(100% - 2em);
+	margin: auto;
+	padding: 3em 1em;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0 0 0.5rem 0;
+	color: rgb(var(--black));
+	line-height: 1.2;
+}
+h1 {
+	font-size: 3.052em;
+}
+h2 {
+	font-size: 2.441em;
+}
+h3 {
+	font-size: 1.953em;
+}
+h4 {
+	font-size: 1.563em;
+}
+h5 {
+	font-size: 1.25em;
+}
+strong,
+b {
+	font-weight: 700;
+}
+a {
+	color: var(--accent);
+	text-decoration: none;
+	transition: all 0.3s ease;
+	position: relative;
+}
+a:hover {
+	color: var(--accent-glow);
+	text-shadow: var(--neon-glow);
+}
+p {
+	margin-bottom: 1em;
+}
+.prose p {
+	margin-bottom: 2em;
+}
+textarea {
+	width: 100%;
+	font-size: 16px;
+}
+input {
+	font-size: 16px;
+}
+table {
+	width: 100%;
+}
+img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 8px;
+}
+code {
+	padding: 2px 5px;
+	background-color: rgba(79, 140, 255, 0.1);
+	border: 1px solid var(--card-border);
+	border-radius: 4px;
+	color: var(--accent-glow);
+}
+pre {
+	padding: 1.5em;
+	border-radius: 8px;
+	background-color: var(--card-bg);
+	border: 1px solid var(--card-border);
+	box-shadow: var(--neon-glow);
+}
+pre > code {
+	all: unset;
+}
+blockquote {
+	border-left: 4px solid var(--accent);
+	padding: 0 0 0 20px;
+	margin: 0;
+	font-size: 1.333em;
+	box-shadow: var(--neon-glow);
+	padding-left: 24px;
+}
+hr {
+	border: none;
+	border-top: 1px solid var(--card-border);
+	box-shadow: 0 1px 3px rgba(79, 140, 255, 0.2);
+}
+@media (max-width: 720px) {
+	body {
+		font-size: 18px;
+	}
+	main {
+		padding: 1em;
+	}
+}
+
+.sr-only {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
+	clip: rect(1px 1px 1px 1px);
+	/* maybe deprecated but we need to support legacy browsers */
+	clip: rect(1px, 1px, 1px, 1px);
+	/* modern browsers, clip-path works inwards from each corner */
+	clip-path: inset(50%);
+	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
+	white-space: nowrap;
+}

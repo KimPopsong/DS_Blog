@@ -1,0 +1,136 @@
+---
+import { SITE_TITLE } from '../consts';
+import HeaderLink from './HeaderLink.astro';
+---
+
+<header>
+	<nav>
+		<h2><a href="/">{SITE_TITLE}</a></h2>
+		<div class="internal-links">
+			<HeaderLink href="/">Home</HeaderLink>
+			<HeaderLink href="/blog">Blog</HeaderLink>
+			<HeaderLink href="/about">About</HeaderLink>
+		</div>
+		<div class="search-container">
+			<input
+				type="search"
+				id="search-input"
+				placeholder="검색..."
+				class="search-input"
+				aria-label="블로그 검색"
+			/>
+			<svg class="search-icon" viewBox="0 0 16 16" aria-hidden="true" width="20" height="20">
+				<path
+					fill="currentColor"
+					d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"
+				/>
+			</svg>
+		</div>
+	</nav>
+</header>
+<style>
+	header {
+		margin: 0;
+		padding: 0 2em;
+		background: rgba(15, 20, 35, 0.8);
+		backdrop-filter: blur(10px);
+		border-bottom: 1px solid var(--card-border);
+		box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+		position: sticky;
+		top: 0;
+		z-index: 100;
+	}
+	h2 {
+		margin: 0;
+		font-size: 1.2em;
+		font-weight: 700;
+	}
+
+	h2 a,
+	h2 a.active {
+		text-decoration: none;
+		color: rgb(var(--black));
+		transition: all 0.3s ease;
+	}
+	h2 a:hover {
+		color: var(--accent);
+		text-shadow: var(--neon-glow);
+	}
+	nav {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 1em 0;
+	}
+	.internal-links {
+		display: flex;
+		gap: 0.5em;
+	}
+	nav a {
+		padding: 0.75em 1.5em;
+		color: rgb(var(--gray-dark));
+		border-bottom: 2px solid transparent;
+		text-decoration: none;
+		transition: all 0.3s ease;
+		border-radius: 4px;
+	}
+	nav a:hover {
+		color: var(--accent-glow);
+		background: rgba(79, 140, 255, 0.1);
+	}
+	nav a.active {
+		color: var(--accent);
+		border-bottom-color: var(--accent);
+		text-shadow: var(--neon-glow);
+	}
+	.search-container {
+		position: relative;
+		display: flex;
+		align-items: center;
+	}
+	.search-input {
+		padding: 0.6em 2.5em 0.6em 1em;
+		background: var(--card-bg);
+		border: 1px solid var(--card-border);
+		border-radius: 8px;
+		color: rgb(var(--black));
+		font-size: 0.95rem;
+		width: 250px;
+		transition: all 0.3s ease;
+	}
+	.search-input:focus {
+		outline: none;
+		border-color: var(--accent);
+		box-shadow: var(--neon-glow);
+		width: 300px;
+	}
+	.search-input::placeholder {
+		color: rgb(var(--gray));
+	}
+	.search-icon {
+		position: absolute;
+		right: 0.75em;
+		color: rgb(var(--gray));
+		pointer-events: none;
+	}
+	.search-input:focus + .search-icon {
+		color: var(--accent);
+	}
+	@media (max-width: 720px) {
+		header {
+			padding: 0 1em;
+		}
+		.search-container {
+			display: none;
+		}
+		.internal-links {
+			gap: 0.25em;
+		}
+		nav a {
+			padding: 0.5em 1em;
+			font-size: 0.9em;
+		}
+	}
+</style>

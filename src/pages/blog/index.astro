@@ -1,0 +1,541 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const allPosts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+// 포스트 본문 내용 추출 (검색용)
+const postsWithContent = await Promise.all(
+	allPosts.map(async (post) => {
+		let bodyText = '';
+		try {
+			// 마크다운 파일 경로 구성
+			const filePath = join(process.cwd(), 'src', 'content', 'blog', `${post.id}.md`);
+			const fileContent = await readFile(filePath, 'utf-8');
+			
+			// frontmatter 제거하고 본문만 추출
+			const frontmatterEnd = fileContent.indexOf('---', 3);
+			if (frontmatterEnd !== -1) {
+				bodyText = fileContent.substring(frontmatterEnd + 3).trim();
+				// 마크다운 문법 제거 (간단한 버전)
+				bodyText = bodyText
+					.replace(/^#+\s+/gm, '') // 헤더 제거
+					.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // 링크 제거
+					.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '') // 이미지 제거
+					.replace(/\*\*([^\*]+)\*\*/g, '$1') // 볼드 제거
+					.replace(/\*([^\*]+)\*/g, '$1') // 이탤릭 제거
+					.replace(/`([^`]+)`/g, '$1') // 인라인 코드 제거
+					.replace(/```[\s\S]*?```/g, '') // 코드 블록 제거
+					.replace(/\n+/g, ' ') // 줄바꿈을 공백으로
+					.trim()
+					.substring(0, 1000); // 최대 1000자
+			}
+		} catch (e) {
+			// 파일 읽기 실패 시 description 사용
+			bodyText = post.data.description || '';
+		}
+		
+		return {
+			...post,
+			bodyText: bodyText,
+		};
+	})
+);
+
+const featuredPost = postsWithContent[0];
+const otherPosts = postsWithContent.slice(1); // 나머지 모든 포스트
+
+// 검색용 데이터 준비 (제목, 설명, 태그, 내용)
+const searchData = postsWithContent.map((post) => ({
+	id: post.id,
+	title: post.data.title,
+	description: post.data.description,
+	tags: post.data.tags || [],
+	content: post.bodyText,
+	heroImage: post.data.heroImage?.src || null,
+	pubDate: post.data.pubDate.toISOString(),
+}));
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				max-width: 1400px;
+				width: 100%;
+				padding: 4em 2em;
+			}
+			.page-title {
+				font-size: 3.5rem;
+				font-weight: 700;
+				margin-bottom: 0.5em;
+				background: linear-gradient(135deg, rgb(var(--black)) 0%, var(--accent-glow) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				text-align: center;
+			}
+			.posts-container {
+				display: flex;
+				flex-direction: column;
+				gap: 2rem;
+				list-style-type: none;
+				margin: 3rem 0 0 0;
+				padding: 0;
+			}
+			.posts-list {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 2rem;
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			.post-item {
+				opacity: 0;
+				transform: translateY(20px);
+				transition: opacity 0.6s ease, transform 0.6s ease;
+			}
+			.post-item.visible {
+				opacity: 1;
+				transform: translateY(0);
+			}
+			.post-item.hidden {
+				display: none;
+			}
+			.no-results {
+				grid-column: 1 / -1;
+				text-align: center;
+				padding: 4rem 2rem;
+				color: rgb(var(--gray));
+			}
+			.no-results h3 {
+				font-size: 1.5rem;
+				margin-bottom: 0.5rem;
+				color: rgb(var(--black));
+			}
+			.loading-indicator {
+				grid-column: 1 / -1;
+				text-align: center;
+				padding: 2rem;
+				color: rgb(var(--gray));
+				display: none;
+			}
+			.loading-indicator.active {
+				display: block;
+			}
+			.post-card {
+				display: flex;
+				flex-direction: row;
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 16px;
+				overflow: hidden;
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				text-decoration: none;
+				position: relative;
+			}
+			.post-card::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(135deg, rgba(79, 140, 255, 0.1) 0%, transparent 100%);
+				opacity: 0;
+				transition: opacity 0.4s ease;
+				pointer-events: none;
+			}
+			.post-card:hover {
+				transform: translateY(-8px);
+				border-color: var(--accent);
+				box-shadow: var(--neon-glow), 0 20px 40px rgba(0, 0, 0, 0.4);
+			}
+			.post-card:hover::before {
+				opacity: 1;
+			}
+			.featured-card {
+				flex-direction: row;
+			}
+			.post-image-wrapper {
+				width: 40%;
+				flex-shrink: 0;
+				overflow: hidden;
+			}
+			.featured-card .post-image-wrapper {
+				width: 50%;
+			}
+			.post-image {
+				width: 100%;
+				height: 100%;
+				min-height: 200px;
+				object-fit: cover;
+				display: block;
+				transition: transform 0.4s ease;
+			}
+			.featured-card .post-image {
+				min-height: 350px;
+			}
+			.post-card:hover .post-image {
+				transform: scale(1.05);
+			}
+			.post-content {
+				padding: 1.5rem;
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+				justify-content: center;
+			}
+			.featured-card .post-content {
+				padding: 2.5rem;
+			}
+			.post-title {
+				margin: 0 0 0.75rem 0;
+				color: rgb(var(--black));
+				line-height: 1.3;
+				font-size: 1.2rem;
+				font-weight: 600;
+				transition: color 0.3s ease;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+				word-break: keep-all;
+			}
+			.featured-card .post-title {
+				font-size: 1.8rem;
+				-webkit-line-clamp: 2;
+				margin-bottom: 1rem;
+			}
+			.post-card:hover .post-title {
+				color: var(--accent-glow);
+			}
+			.post-date {
+				margin: 0 0 0.75rem 0;
+				color: rgb(var(--gray));
+				font-size: 0.85rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			.post-date::before {
+				content: '📅';
+				font-size: 1rem;
+			}
+			.post-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-top: auto;
+				padding-top: 0.5rem;
+			}
+			.post-tag {
+				display: inline-block;
+				padding: 0.4rem 0.8rem;
+				background: rgba(79, 140, 255, 0.1);
+				border: 1px solid var(--card-border);
+				border-radius: 6px;
+				color: var(--accent);
+				font-size: 0.85rem;
+				transition: all 0.3s ease;
+			}
+			.post-card:hover .post-tag {
+				background: rgba(79, 140, 255, 0.2);
+				border-color: var(--accent);
+			}
+			@media (max-width: 1024px) {
+				.posts-list {
+					grid-template-columns: 1fr;
+				}
+				.featured-card,
+				.post-card {
+					flex-direction: column;
+				}
+				.post-image-wrapper,
+				.featured-card .post-image-wrapper {
+					width: 100%;
+				}
+				.post-image,
+				.featured-card .post-image {
+					min-height: 250px;
+				}
+			}
+			@media (max-width: 720px) {
+				main {
+					padding: 2em 1em;
+				}
+				.page-title {
+					font-size: 2.5rem;
+				}
+				.posts-container {
+					gap: 1.5rem;
+				}
+				.posts-list {
+					grid-template-columns: 1fr;
+					gap: 1.5rem;
+				}
+				.featured-card .post-content {
+					padding: 1.5rem;
+				}
+				.featured-card .post-title {
+					font-size: 1.4rem;
+				}
+				.post-content {
+					padding: 1.25rem;
+				}
+				.post-title {
+					font-size: 1.1rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1 class="page-title">Blog Posts</h1>
+			<ul class="posts-container">
+				{featuredPost && (
+					<li>
+						<a href={`/blog/${featuredPost.id}/`} class="post-card featured-card">
+							{featuredPost.data.heroImage && (
+								<div class="post-image-wrapper">
+									<Image
+										width={720}
+										height={360}
+										src={featuredPost.data.heroImage}
+										alt=""
+										class="post-image"
+									/>
+								</div>
+							)}
+							<div class="post-content">
+								<h2 class="post-title">{featuredPost.data.title}</h2>
+								<p class="post-date">
+									<FormattedDate date={featuredPost.data.pubDate} />
+								</p>
+								{featuredPost.data.tags && featuredPost.data.tags.length > 0 && (
+									<div class="post-tags">
+										{featuredPost.data.tags.slice(0, 3).map((tag) => (
+											<span class="post-tag">{tag}</span>
+										))}
+									</div>
+								)}
+							</div>
+						</a>
+					</li>
+				)}
+				{otherPosts.length > 0 && (
+					<ul class="posts-list" id="posts-list">
+						{
+							otherPosts.map((post, index) => (
+								<li class="post-item" data-index={index} data-post-id={post.id}>
+									<a href={`/blog/${post.id}/`} class="post-card">
+										{post.data.heroImage && (
+											<div class="post-image-wrapper">
+												<Image
+													width={720}
+													height={360}
+													src={post.data.heroImage}
+													alt=""
+													class="post-image"
+												/>
+											</div>
+										)}
+										<div class="post-content">
+											<h2 class="post-title">{post.data.title}</h2>
+											<p class="post-date">
+												<FormattedDate date={post.data.pubDate} />
+											</p>
+											{post.data.tags && post.data.tags.length > 0 && (
+												<div class="post-tags">
+													{post.data.tags.slice(0, 3).map((tag) => (
+														<span class="post-tag">{tag}</span>
+													))}
+												</div>
+											)}
+										</div>
+									</a>
+								</li>
+							))
+						}
+						<li class="loading-indicator" id="loading-indicator">
+							로딩 중...
+						</li>
+						<li class="no-results" id="no-results" style="display: none;">
+							<h3>검색 결과가 없습니다</h3>
+							<p>다른 키워드로 검색해보세요.</p>
+						</li>
+					</ul>
+				)}
+			</ul>
+		</main>
+		<Footer />
+		<script define:vars={{ searchData }}>
+			(function() {
+				const postsList = document.getElementById('posts-list');
+				const loadingIndicator = document.getElementById('loading-indicator');
+				const noResults = document.getElementById('no-results');
+				const searchInput = document.getElementById('search-input');
+				let postItems = Array.from(document.querySelectorAll('.post-item'));
+				let featuredCard = document.querySelector('.featured-card')?.closest('li');
+				
+				if (!postsList || postItems.length === 0) return;
+				
+				let visibleCount = 4; // 초기에 4개만 보이게 (2줄)
+				let isLoading = false;
+				let isSearchMode = false;
+				
+				// 검색 함수
+				function searchPosts(query) {
+					if (!query || query.trim() === '') {
+						isSearchMode = false;
+						// 검색 모드 해제 - 모든 포스트 표시
+						postItems.forEach((item, index) => {
+							item.classList.remove('hidden');
+							if (index < visibleCount) {
+								item.classList.add('visible');
+							} else {
+								item.classList.remove('visible');
+							}
+						});
+						if (featuredCard) featuredCard.style.display = '';
+						noResults.style.display = 'none';
+						loadingIndicator.style.display = visibleCount < postItems.length ? 'block' : 'none';
+						return;
+					}
+					
+					isSearchMode = true;
+					const searchTerm = query.toLowerCase().trim();
+					
+					// 검색 실행
+					const matchingPostIds = searchData
+						.filter((post) => {
+							const titleMatch = post.title.toLowerCase().includes(searchTerm);
+							const descriptionMatch = post.description.toLowerCase().includes(searchTerm);
+							const tagsMatch = post.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+							const contentMatch = post.content.toLowerCase().includes(searchTerm);
+							return titleMatch || descriptionMatch || tagsMatch || contentMatch;
+						})
+						.map(post => post.id);
+					
+					// Featured 카드 숨기기
+					if (featuredCard) featuredCard.style.display = 'none';
+					
+					// 검색 결과 표시
+					let visibleInSearch = 0;
+					postItems.forEach((item) => {
+						const postId = item.getAttribute('data-post-id');
+						if (matchingPostIds.includes(postId)) {
+							item.classList.remove('hidden');
+							item.classList.add('visible');
+							visibleInSearch++;
+						} else {
+							item.classList.add('hidden');
+							item.classList.remove('visible');
+						}
+					});
+					
+					// 검색 결과 없음 메시지
+					if (visibleInSearch === 0) {
+						noResults.style.display = 'block';
+						loadingIndicator.style.display = 'none';
+					} else {
+						noResults.style.display = 'none';
+						loadingIndicator.style.display = 'none';
+					}
+				}
+				
+				// 검색 입력 이벤트
+				if (searchInput) {
+					let searchTimeout;
+					searchInput.addEventListener('input', (e) => {
+						clearTimeout(searchTimeout);
+						searchTimeout = setTimeout(() => {
+							searchPosts(e.target.value);
+						}, 300); // 디바운스 300ms
+					});
+				}
+				
+				// 초기 포스트 표시
+				function showInitialPosts() {
+					postItems.forEach((item, index) => {
+						if (index < visibleCount) {
+							setTimeout(() => {
+								item.classList.add('visible');
+							}, index * 100);
+						}
+					});
+				}
+				
+				// 추가 포스트 로드
+				function loadMorePosts() {
+					if (isSearchMode || isLoading || visibleCount >= postItems.length) {
+						if (visibleCount >= postItems.length) {
+							loadingIndicator?.classList.remove('active');
+						}
+						return;
+					}
+					
+					isLoading = true;
+					loadingIndicator?.classList.add('active');
+					
+					// 다음 2개 포스트 표시 (한 줄에 2개)
+					const nextCount = Math.min(visibleCount + 2, postItems.length);
+					
+					setTimeout(() => {
+						for (let i = visibleCount; i < nextCount; i++) {
+							if (postItems[i]) {
+								setTimeout(() => {
+									postItems[i].classList.add('visible');
+								}, (i - visibleCount) * 100);
+							}
+						}
+						
+						visibleCount = nextCount;
+						isLoading = false;
+						
+						if (visibleCount >= postItems.length) {
+							loadingIndicator?.classList.remove('active');
+						}
+					}, 300);
+				}
+				
+				// Intersection Observer로 스크롤 감지
+				const observerOptions = {
+					root: null,
+					rootMargin: '200px',
+					threshold: 0.1
+				};
+				
+				const observer = new IntersectionObserver((entries) => {
+					entries.forEach(entry => {
+						if (entry.isIntersecting) {
+							loadMorePosts();
+						}
+					});
+				}, observerOptions);
+				
+				// 초기 포스트 표시
+				showInitialPosts();
+				
+				// 로딩 인디케이터 관찰 시작
+				if (visibleCount < postItems.length) {
+					loadingIndicator?.classList.add('active');
+					observer.observe(loadingIndicator);
+				}
+			})();
+		</script>
+	</body>
+</html>

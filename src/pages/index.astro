@@ -1,0 +1,149 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 6rem 2rem;
+			}
+			.hero-section {
+				text-align: center;
+				margin-bottom: 6rem;
+			}
+			.hero-title {
+				font-size: 5rem;
+				font-weight: 700;
+				margin: 0 0 1.5rem 0;
+				line-height: 1.1;
+				background: linear-gradient(135deg, rgb(var(--black)) 0%, var(--accent) 50%, var(--accent-glow) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				animation: gradient-shift 3s ease infinite;
+				background-size: 200% 200%;
+			}
+			@keyframes gradient-shift {
+				0%, 100% { background-position: 0% 50%; }
+				50% { background-position: 100% 50%; }
+			}
+			.hero-subtitle {
+				font-size: 1.5rem;
+				color: rgb(var(--gray-dark));
+				margin-bottom: 3rem;
+				line-height: 1.6;
+			}
+			.cta-button {
+				display: inline-block;
+				padding: 1.2rem 3rem;
+				background: var(--card-bg);
+				border: 2px solid var(--accent);
+				border-radius: 12px;
+				color: var(--accent);
+				text-decoration: none;
+				font-weight: 600;
+				font-size: 1.1rem;
+				transition: all 0.3s ease;
+				box-shadow: var(--neon-glow);
+			}
+			.cta-button:hover {
+				background: var(--accent);
+				color: rgb(var(--black));
+				transform: translateY(-3px);
+				box-shadow: var(--neon-glow), 0 10px 30px rgba(79, 140, 255, 0.4);
+			}
+			.features-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+				gap: 2rem;
+				margin-top: 4rem;
+			}
+			.feature-card {
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 16px;
+				padding: 2.5rem;
+				transition: all 0.3s ease;
+			}
+			.feature-card:hover {
+				border-color: var(--accent);
+				transform: translateY(-5px);
+				box-shadow: var(--neon-glow);
+			}
+			.feature-icon {
+				font-size: 3rem;
+				margin-bottom: 1rem;
+			}
+			.feature-title {
+				font-size: 1.5rem;
+				margin: 0 0 1rem 0;
+				color: rgb(var(--black));
+			}
+			.feature-description {
+				color: rgb(var(--gray-dark));
+				line-height: 1.7;
+				margin: 0;
+			}
+			@media (max-width: 720px) {
+				main {
+					padding: 3rem 1rem;
+				}
+				.hero-title {
+					font-size: 3rem;
+				}
+				.hero-subtitle {
+					font-size: 1.2rem;
+				}
+				.features-grid {
+					grid-template-columns: 1fr;
+					gap: 1.5rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="hero-section">
+				<h1 class="hero-title">안녕하세요 👋</h1>
+				<p class="hero-subtitle">
+					개발과 학습의 여정을 기록하는 공간입니다.<br />
+					Spring, JPA, 그리고 다양한 프로젝트 경험을 공유합니다.
+				</p>
+				<a href="/blog" class="cta-button">블로그 보기 →</a>
+			</div>
+			<div class="features-grid">
+				<div class="feature-card">
+					<div class="feature-icon">📚</div>
+					<h2 class="feature-title">학습 기록</h2>
+					<p class="feature-description">
+						공부한 내용을 체계적으로 정리하고 기록합니다. Spring, JPA 등 백엔드 기술에 대한 학습 내용을 공유합니다.
+					</p>
+				</div>
+				<div class="feature-card">
+					<div class="feature-icon">💡</div>
+					<h2 class="feature-title">프로젝트 회고</h2>
+					<p class="feature-description">
+						프로젝트를 진행하며 겪은 경험과 배운 점을 회고하고 공유합니다. 성공과 실패 모두 의미 있는 학습입니다.
+					</p>
+				</div>
+				<div class="feature-card">
+					<div class="feature-icon">🔧</div>
+					<h2 class="feature-title">트러블슈팅</h2>
+					<p class="feature-description">
+						개발 중 마주친 문제들과 해결 과정을 기록합니다. 같은 문제를 겪는 분들에게 도움이 되길 바랍니다.
+					</p>
+				</div>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>

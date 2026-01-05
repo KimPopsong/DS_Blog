@@ -1,0 +1,172 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+
+type Props = CollectionEntry<'blog'>['data'];
+
+const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			main {
+				width: 100%;
+				max-width: 100%;
+				margin: 0;
+				padding: 0;
+			}
+			article {
+				max-width: 1200px;
+				margin: 0 auto;
+			}
+			.hero-section {
+				position: relative;
+				width: 100%;
+				margin-bottom: 4rem;
+				overflow: hidden;
+			}
+			.hero-image {
+				width: 100%;
+				position: relative;
+			}
+			.hero-image::after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 200px;
+				background: linear-gradient(to top, #050814 0%, transparent 100%);
+				pointer-events: none;
+			}
+			.hero-image img {
+				display: block;
+				width: 100%;
+				height: auto;
+				border-radius: 0;
+			}
+			.article-header {
+				position: relative;
+				padding: 3rem 2rem;
+				text-align: center;
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 20px;
+				margin: -4rem 2rem 0 2rem;
+				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
+			}
+			.article-meta {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 1rem;
+				margin-bottom: 1.5rem;
+				flex-wrap: wrap;
+			}
+			.date {
+				color: var(--accent);
+				font-size: 0.95rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			.date::before {
+				content: '📅';
+				font-size: 1.1rem;
+			}
+			.last-updated-on {
+				color: rgb(var(--gray));
+				font-size: 0.85rem;
+				font-style: italic;
+			}
+			.article-title {
+				margin: 0;
+				font-size: 3.5rem;
+				line-height: 1.2;
+				background: linear-gradient(135deg, rgb(var(--black)) 0%, var(--accent-glow) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+			.prose {
+				max-width: 800px;
+				margin: 4rem auto;
+				padding: 0 2rem;
+				color: rgb(var(--gray-dark));
+			}
+			.prose h2 {
+				margin-top: 3rem;
+				margin-bottom: 1rem;
+				padding-bottom: 0.5rem;
+				border-bottom: 2px solid var(--card-border);
+			}
+			.prose h3 {
+				margin-top: 2rem;
+				color: var(--accent-glow);
+			}
+			.prose img {
+				border-radius: 12px;
+				border: 1px solid var(--card-border);
+				box-shadow: var(--neon-glow);
+				margin: 2rem 0;
+			}
+			.prose code {
+				font-size: 0.9em;
+			}
+			@media (max-width: 720px) {
+				.article-header {
+					margin: -2rem 1rem 0 1rem;
+					padding: 2rem 1.5rem;
+				}
+				.article-title {
+					font-size: 2rem;
+				}
+				.prose {
+					padding: 0 1rem;
+					margin: 2rem auto;
+				}
+				.hero-image::after {
+					height: 100px;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<article>
+				{heroImage && (
+					<div class="hero-section">
+						<div class="hero-image">
+							<Image width={1200} height={600} src={heroImage} alt="" />
+						</div>
+					</div>
+				)}
+				<div class="article-header">
+					<div class="article-meta">
+						<div class="date">
+							<FormattedDate date={pubDate} />
+						</div>
+						{updatedDate && (
+							<div class="last-updated-on">
+								업데이트: <FormattedDate date={updatedDate} />
+							</div>
+						)}
+					</div>
+					<h1 class="article-title">{title}</h1>
+				</div>
+				<div class="prose">
+					<slot />
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>

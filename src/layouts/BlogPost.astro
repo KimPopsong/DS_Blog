@@ -5,15 +5,23 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tags } = Astro.props;
+
+// 페이지 경로에 따라 타이틀 설정
+const pathname = Astro.url.pathname;
+let pageTitle = `Blog | ${SITE_TITLE}`;
+if (pathname.includes('/about')) {
+	pageTitle = `About | ${SITE_TITLE}`;
+}
 ---
 
 <html lang="en">
 	<head>
-		<BaseHead title={title} description={description} />
+		<BaseHead title={pageTitle} description={description} />
 		<style>
 			main {
 				width: 100%;
@@ -61,13 +69,37 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				margin: -4rem 2rem 0 2rem;
 				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
 			}
+			.article-title {
+				margin: 0 0 1.5rem 0;
+				font-size: 3.5rem;
+				line-height: 1.2;
+				background: linear-gradient(135deg, rgb(var(--black)) 0%, var(--accent-glow) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
 			.article-meta {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				gap: 1rem;
-				margin-bottom: 1.5rem;
+				gap: 1.5rem;
 				flex-wrap: wrap;
+			}
+			.article-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				align-items: center;
+			}
+			.article-tag {
+				display: inline-block;
+				padding: 0.4rem 0.8rem;
+				background: rgba(79, 140, 255, 0.1);
+				border: 1px solid var(--card-border);
+				border-radius: 6px;
+				color: var(--accent);
+				font-size: 0.85rem;
+				transition: all 0.3s ease;
 			}
 			.date {
 				color: var(--accent);
@@ -84,15 +116,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				color: rgb(var(--gray));
 				font-size: 0.85rem;
 				font-style: italic;
-			}
-			.article-title {
-				margin: 0;
-				font-size: 3.5rem;
-				line-height: 1.2;
-				background: linear-gradient(135deg, rgb(var(--black)) 0%, var(--accent-glow) 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
 			}
 			.prose {
 				max-width: 800px;
@@ -150,7 +173,15 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 					</div>
 				)}
 				<div class="article-header">
+					<h1 class="article-title">{title}</h1>
 					<div class="article-meta">
+						{tags && tags.length > 0 && (
+							<div class="article-tags">
+								{tags.map((tag) => (
+									<span class="article-tag">{tag}</span>
+								))}
+							</div>
+						)}
 						<div class="date">
 							<FormattedDate date={pubDate} />
 						</div>
@@ -160,7 +191,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 							</div>
 						)}
 					</div>
-					<h1 class="article-title">{title}</h1>
 				</div>
 				<div class="prose">
 					<slot />

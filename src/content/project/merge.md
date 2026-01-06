@@ -2,7 +2,7 @@
 title: "머지?"
 pubDate: 2025-01-04T00:00+09:00
 description: "머지? 프로젝트 설명"
-heroImage: '../../assets/blog-placeholder-4.jpg'
+# heroImage: '../../assets/projects/merge/merge.jpg'
 tags: ["프로젝트"]
 ---
 

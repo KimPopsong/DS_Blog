@@ -30,7 +30,7 @@ const resume = defineCollection({
 
 const project = defineCollection({
 	// Load Markdown and MDX files in the `src/content/project/` directory.
-	loader: glob({ base: './src/content/project', pattern: '**/*.{md,mdx}' }),
+	loader: glob({ base: './src/content/project', pattern: '*.{md,mdx}' }),
 	// Type-check frontmatter using a schema
 	schema: ({ image }) =>
 		z.object({
@@ -40,8 +40,16 @@ const project = defineCollection({
 			updatedDate: z.coerce.date().optional(),
 			startDate: z.coerce.date().optional(),
 			endDate: z.coerce.date().optional(),
+			thumbnail: image().optional(),
 			heroImage: image().optional(),
 			tags: z.array(z.string()).optional(),
+			gitHub: z.string().url().optional(),
+			gitHubPrivate: z.boolean().optional(),
+			gitLab: z.string().url().optional(),
+			gitLabPrivate: z.boolean().optional(),
+			link: z.string().url().optional(),
+			linkClosed: z.boolean().optional(),
+			teamSize: z.string().optional(),
 		}),
 });
 

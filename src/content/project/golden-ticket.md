@@ -2,7 +2,7 @@
 title: "골든티켓"
 pubDate: 2025-01-02T00:00+09:00
 description: "골든티켓 프로젝트 설명"
-heroImage: '../../assets/blog-placeholder-2.jpg'
+# heroImage: '../../assets/projects/golden-ticket/golden-ticket.jpg'
 tags: ["프로젝트"]
 ---
 

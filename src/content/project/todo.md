@@ -2,7 +2,7 @@
 title: "TODO"
 pubDate: 2025-01-03T00:00+09:00
 description: "TODO 프로젝트 설명"
-heroImage: '../../assets/blog-placeholder-3.jpg'
+# heroImage: '../../assets/projects/todo/todo.jpg'
 tags: ["프로젝트"]
 ---
 

@@ -18,15 +18,17 @@ const sortedProjects = projectOrder
 	.filter(Boolean);
 
 // 프로젝트 데이터 준비 (이미지 URL 포함)
-const projectsData = sortedProjects
-	.filter((project): project is NonNullable<typeof project> => project !== undefined)
-	.map((project) => {
-		let imageUrl = '';
-		if (project.data.heroImage) {
-			// 이미지 객체에서 src 속성 추출
-			const image = project.data.heroImage;
-			imageUrl = typeof image === 'object' && 'src' in image ? image.src : '';
-		}
+	const projectsData = sortedProjects
+		.filter((project): project is NonNullable<typeof project> => project !== undefined)
+		.map((project) => {
+			let imageUrl = '';
+			// thumbnail이 있으면 thumbnail 우선 사용, 없으면 heroImage 사용
+			const imageSource = project.data.thumbnail || project.data.heroImage;
+			if (imageSource) {
+				// 이미지 객체에서 src 속성 추출
+				const image = imageSource;
+				imageUrl = typeof image === 'object' && 'src' in image ? image.src : '';
+			}
 		return {
 			id: project.id,
 			title: project.data.title,
@@ -494,6 +496,13 @@ if (resumeEntry) {
 				font-size: 0.85rem;
 				color: rgb(var(--gray));
 				margin-top: 0.5rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			.resume-content :global(.project-card-date::before) {
+				content: '📅';
+				font-size: 1rem;
 			}
 			/* 인라인 스타일이 있는 div도 지원 */
 			.resume-content :global(div[style*="display: flex"]) {
@@ -818,8 +827,8 @@ if (resumeEntry) {
 								<div class="project-card-content">
 									<h3 class="project-card-title">${project.title}</h3>
 									<p class="project-card-description">${project.description || ''}</p>
-									${tagsHtml}
 									<div class="project-card-date">${dateStr}</div>
+									${tagsHtml}
 								</div>
 							</a>
 						`;

@@ -2,7 +2,7 @@
 title: "책 찾는 여우"
 pubDate: 2025-01-05T00:00+09:00
 description: "책 찾는 여우 프로젝트 설명"
-heroImage: '../../assets/blog-placeholder-5.jpg'
+# heroImage: '../../assets/projects/book-fox/book-fox.jpg'
 tags: ["프로젝트"]
 ---
 

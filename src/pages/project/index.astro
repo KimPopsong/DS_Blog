@@ -96,6 +96,15 @@ const sortedProjects = projectOrder
 				font-size: 0.9rem;
 				color: rgb(var(--gray));
 			}
+			.project-meta > span {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			.project-meta > span::before {
+				content: '📅';
+				font-size: 1rem;
+			}
 			.project-tags {
 				display: flex;
 				gap: 0.5rem;
@@ -158,11 +167,14 @@ const sortedProjects = projectOrder
 		<main>
 			<h1 class="page-title">Projects</h1>
 			<div class="projects-list">
-				{sortedProjects.map((project) => (
+				{sortedProjects.map((project) => {
+					// thumbnail이 있으면 thumbnail 사용, 없으면 heroImage 사용
+					const displayImage = project.data.thumbnail || project.data.heroImage;
+					return (
 					<a href={`/project/${project.id}`} class="project-card">
-						{project.data.heroImage && (
+						{displayImage && (
 							<div class="project-image">
-								<Image src={project.data.heroImage} alt={project.data.title} />
+								<Image src={displayImage} alt={project.data.title} />
 							</div>
 						)}
 						<div class="project-content">
@@ -186,7 +198,8 @@ const sortedProjects = projectOrder
 							)}
 						</div>
 					</a>
-				))}
+					);
+				})}
 			</div>
 		</main>
 		<Footer />

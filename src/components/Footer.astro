@@ -1,31 +1,103 @@
 ---
-const today = new Date();
+const year = new Date().getFullYear();
+const email = "kimds5344@naver.com";
 ---
 
-<footer>
-	&copy; {today.getFullYear()} Your name here. All rights reserved.
+<footer class="site-footer">
+	<div class="inner">
+		<p class="primary">
+			<span class="copy">&copy; {year}</span>
+			<span class="sep" aria-hidden="true">·</span>
+			<span class="name">Daeseong Kim</span>
+			<span class="sep" aria-hidden="true">·</span>
+			<span class="role">Backend Developer</span>
+		</p>
+
+		<a class="email" href={`mailto:${email}`} aria-label="Send email">
+			{email}
+		</a>
+	</div>
 </footer>
+
 <style>
-	footer {
-		padding: 3em 1em 4em 1em;
+	.site-footer {
+		margin-top: clamp(3.5rem, 6vw, 6rem);
+		padding: clamp(1.75rem, 3vw, 2.75rem) 1rem;
 		background: var(--card-bg);
 		border-top: 1px solid var(--card-border);
-		color: rgb(var(--gray));
 		text-align: center;
-		margin-top: 6rem;
-		font-size: 0.9rem;
 	}
+
+	.inner {
+		max-width: 72rem;
+		margin: 0 auto;
+		display: grid;
+		gap: 0.6rem;
+		place-items: center;
+	}
+
+	.primary {
+		margin: 0;
+		font-size: 0.95rem;
+		line-height: 1.2;
+		letter-spacing: 0.2px;
+		color: rgb(var(--gray-dark));
+		opacity: 0.9;
+	}
+
+	.sep {
+		display: inline-block;
+		margin: 0 0.35rem;
+		opacity: 0.55;
+	}
+
+	.email {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+
+		font-size: 0.9rem;
+		line-height: 1.2;
+		color: rgb(var(--gray));
+		opacity: 0.72;
+
+		text-decoration: none;
+		padding: 0.2rem 0.4rem;
+		border-radius: 999px;
+		transition:
+			opacity 180ms ease,
+			color 180ms ease,
+			background-color 180ms ease,
+			transform 180ms ease;
+	}
+
+	.email:hover {
+		opacity: 0.95;
+		color: rgb(var(--gray-dark));
+		background-color: rgba(255, 255, 255, 0.04);
+		transform: translateY(-1px);
+	}
+
+	.email:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 3px;
+	}
+
 	@media (max-width: 720px) {
-		footer {
-			padding: 2em 1em 3em 1em;
-			margin-top: 4rem;
+		.primary {
+			font-size: 0.9rem;
+		}
+		.email {
 			font-size: 0.85rem;
 		}
 	}
+
 	@media (max-width: 480px) {
-		footer {
-			padding: 1.5em 0.75em 2em 0.75em;
-			font-size: 0.8rem;
+		.site-footer {
+			padding: 1.5rem 0.75rem;
+		}
+		.sep {
+			margin: 0 0.25rem;
 		}
 	}
 </style>

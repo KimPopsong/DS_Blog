@@ -24,14 +24,13 @@ if (pathname.includes('/about')) {
 		<BaseHead title={pageTitle} description={description} />
 		<style>
 			main {
+				max-width: 1400px;
 				width: 100%;
-				max-width: 100%;
-				margin: 0;
-				padding: 0;
+				margin: 0 auto;
+				padding: 4em 2em;
 			}
 			article {
-				max-width: 1200px;
-				margin: 0 auto;
+				width: 100%;
 			}
 			.hero-section {
 				position: relative;
@@ -66,7 +65,7 @@ if (pathname.includes('/about')) {
 				background: var(--card-bg);
 				border: 1px solid var(--card-border);
 				border-radius: 20px;
-				margin: -4rem 2rem 0 2rem;
+				margin: -4rem 0 0 0;
 				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
 			}
 			.article-title {
@@ -118,9 +117,9 @@ if (pathname.includes('/about')) {
 				font-style: italic;
 			}
 			.prose {
-				max-width: 800px;
+				max-width: 100%;
 				margin: 4rem auto;
-				padding: 0 2rem;
+				padding: 0;
 				color: rgb(var(--gray-dark));
 			}
 			.prose h2 {
@@ -143,8 +142,11 @@ if (pathname.includes('/about')) {
 				font-size: 0.9em;
 			}
 			@media (max-width: 1024px) {
+				main {
+					padding: 3em 1.5em;
+				}
 				.article-header {
-					margin: -3rem 1.5rem 0 1.5rem;
+					margin: -3rem 0 0 0;
 					padding: 2.5rem 2rem;
 				}
 				.article-title {
@@ -152,8 +154,11 @@ if (pathname.includes('/about')) {
 				}
 			}
 			@media (max-width: 720px) {
+				main {
+					padding: 2em 1em;
+				}
 				.article-header {
-					margin: -2rem 1rem 0 1rem;
+					margin: -2rem 0 0 0;
 					padding: 2rem 1.5rem;
 				}
 				.article-title {
@@ -185,8 +190,11 @@ if (pathname.includes('/about')) {
 				}
 			}
 			@media (max-width: 480px) {
+				main {
+					padding: 1.5em 0.75em;
+				}
 				.article-header {
-					margin: -1.5rem 0.75rem 0 0.75rem;
+					margin: -1.5rem 0 0 0;
 					padding: 1.5rem 1rem;
 				}
 				.article-title {

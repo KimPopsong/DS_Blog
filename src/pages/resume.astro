@@ -21,10 +21,20 @@ if (resumeEntry) {
 	<head>
 		<BaseHead title={`Resume | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
+			body {
+				text-align: center !important;
+			}
 			main {
-				max-width: 1400px;
-				margin: 0 auto;
-				padding: 4rem 2em;
+				max-width: 800px !important;
+				width: 100% !important;
+				margin-left: auto !important;
+				margin-right: auto !important;
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+				padding: 4rem 2em !important;
+				display: block !important;
+				box-sizing: border-box !important;
+				text-align: left !important;
 			}
 			.resume-content {
 				background: var(--card-bg);
@@ -206,7 +216,9 @@ if (resumeEntry) {
 			}
 			@media (max-width: 1024px) {
 				main {
-					padding: 3rem 1.5em;
+					padding: 3rem 1.5em !important;
+					margin-left: auto !important;
+					margin-right: auto !important;
 				}
 				.resume-content {
 					padding: 3rem 3rem;
@@ -215,7 +227,9 @@ if (resumeEntry) {
 			}
 			@media (max-width: 720px) {
 				main {
-					padding: 2rem 1em;
+					padding: 2rem 1em !important;
+					margin-left: auto !important;
+					margin-right: auto !important;
 				}
 				.resume-content {
 					padding: 2rem 2rem;
@@ -253,7 +267,9 @@ if (resumeEntry) {
 			}
 			@media (max-width: 480px) {
 				main {
-					padding: 1.5rem 0.75em;
+					padding: 1.5rem 0.75em !important;
+					margin-left: auto !important;
+					margin-right: auto !important;
 				}
 				.resume-content {
 					padding: 1.5rem 1.5rem;

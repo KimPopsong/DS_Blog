@@ -15,9 +15,6 @@ const isProject = Astro.url.pathname.includes('/project/');
 // 페이지 경로에 따라 타이틀 설정
 const pathname = Astro.url.pathname;
 let pageTitle = `Blog | ${SITE_TITLE}`;
-if (pathname.includes('/about')) {
-	pageTitle = `About | ${SITE_TITLE}`;
-}
 ---
 
 <html lang="en">

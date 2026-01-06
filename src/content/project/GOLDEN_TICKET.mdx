@@ -1,0 +1,232 @@
+---
+title: "골든티켓"
+pubDate: 2025-08-18T00:00+09:00
+startDate: 2025-07-14
+endDate: 2025-08-18
+description: "시니어 야구 팬을 위한 티켓 양도 플랫폼"
+thumbnail: '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Thumbnail.webp'
+heroImage: '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Hero.webp'
+gitLab: "https://lab.ssafy.com/s13-webmobile2-sub1/S13P11A109"
+gitLabPrivate: true
+link: "https://xn--bb0b44m5yw9qd.xn--hu5b25b77nvwc.xn--3e0b707e/"
+linkClosed: true
+teamSize: "6명"
+tags: ["Spring Boot", "PostgreSQL", "MyBatis", "AWS", "Redis", "Vue"]
+---
+
+import { Image } from 'astro:assets';
+import apply1 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Apply1.gif';
+import apply2 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Apply2.gif';
+import apply3 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Apply3.webp';
+import apply4 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Apply4.webp';
+import apply5 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Apply5.webp';
+import apply6 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Apply6.webp';
+import assignment1 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Assignment1.gif';
+import assignment2 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Assignment2.gif';
+import assignment3 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Assignment3.webp';
+import assignment4 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Assignment4.webp';
+import assignment5 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Assignment5.webp';
+import theme1 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Theme1.gif';
+import theme2 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Theme2.webp';
+import theme3 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Theme3.webp';
+import chatbot1 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Chatbot1.gif';
+import chatbot2 from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_Chatbot2.webp';
+
+## **[개요]**
+
+- 디지털 환경에 익숙하지 않은 시니어 야구 팬들이 복잡한 예매 시스템과 개인 간 거래의 불편함 없이, 공정하고 안전하게 티켓을 양도받을 수 있도록 만든 전용 플랫폼
+
+## [사용 기술 스택]
+
+- Infra
+    - AWS : EC2, S3
+    - Docker
+    - Vite
+    - Nginx, DNS
+    - Gitlab CI/CD
+- BE
+    - 개발 환경 : IntelliJ IDEA
+    - 빌드 도구 : Gradle(8.7)
+    - 프레임워크 : Spring Boot(3.2.5)
+    - DB : PostgreSQL, Redis
+    - 데이터 접근 : MyBatis
+- FE
+    - 개발 환경 : VS Code
+    - 빌드 도구 : Node.js(v24), Vite(7.0.4)
+    - 프레임워크 : Vue(3.5.17)
+- AI
+    - 개발 환경 : Python(3.11)
+    - 빌드 도구 : pip
+    - 프레임워크 : FastAPI
+    - DB / 스토리지 : Pinecone (Vector DB)
+        - 용도 : 벡터 검색 및 RAG
+    - 라이브러리 / 기술
+        - 웹 : Uvicorn
+        - AI / NLP : LangChain, Langchain_upstage
+        - 데이터 처리 : UpstageDocumentParseLoader (Langchain_upstage)
+        - 환경 변수 관리 : python-dotenv
+
+## **[주요 담당 기능]**
+
+- **BE**
+    - Swagger를 통한 API 명세서 발급
+    - Redis를 활용하여 자주 사용되는 데이터 캐싱, DB 접근 최소화로 서비스 응답 속도 향상 및 시스템 성능 최적화
+    - 티켓 도메인
+        - **응모**
+            - 티켓 발급
+                - Timestamp와 User 정보를 활용하여 Base64로 인코딩하여 티켓의 QR코드 생성
+                - 30초마다 재발급 및 유효 기간 설정으로 재양도 금지
+                - AES를 활용한 양방향 암호화로 보안 강화
+            - 알림 기능
+                - 당첨 시 문자 알림 자동 발송으로 결과 즉시 확인 가능
+        - **양도**
+            - 공정성 강화를 위한 사용자 가중치 기반 추첨 알고리즘 설계
+                - 최근 5회 응모 이력을 기준으로 사용자별 가중치 차등 부여
+                - 최소 1 ~ 최대 10 범위의 가중치를 부여 후, 각 사용자에게 부여된 가중치를 누적 합산한 뒤 전체 가중치 합 범위 내에서 난수 추출
+                - 특정 사용자에게 당첨이 편향되는 문제 완화 및 확률적 공정성 보장
+        - **결제**
+            - 카카오페이를 활용한 간편 결제 기능 구현
+- I**nfra**
+    - GitLab Runner 기반 CI/CD 파이프라인 구축으로 자동 빌드·배포 구현
+    - AWS EC2 인스턴스 활용 BE·FE·AI 통합 배포
+    - Redis Sentinel을 도입하여 Master 장애 발생 시 Slave 자동 승격이 가능한 Failover 구조 구성
+    - Docker Compose 활용 Redis, DB 등 서비스 구성 요소 분리로 환경의 일관성 확보
+    - Nginx를 활용한 정적 파일 서빙 및 리버스 프록시 구성
+    - GitLab Variables를 통한 환경 변수 관리로 API 키 외부 노출 최소화
+    - DNS 설정 및 인증서를 통한 HTTPS 적용으로 보안 강화
+
+## **[트러블슈팅 & 문제 해결]**
+
+- Infra
+    - HTTPS 적용 중 BE API가 정상적으로 호출되지 않는 문제
+        - Nginx 설정 문제로 백엔드 프록시 설정을 제대로 처리하지 못하는 문제 발견
+        - Nginx 설정 점검
+            - `location /api` 블록의 `proxy_pass` 경로 수정
+            - `server_name`을 실제 도메인과 일치시키고 SSL 인증서/키 경로 확인
+            - `proxy_set_header` 설정을 추가하여 클라이언트 요청 헤더 전달 보장
+        - CORS 설정 보완
+    - Docker-compose에서 Redis의 Master가 죽었는데, Slave가 자동으로 승격되지 않는 문제
+        - Redis는 단순 Master-Slave 구성만으로는 Failover가 되지 않음을 파악
+        - Redis Sentinel을 도입하여 Master 장애 시 Slave가 자동 승격되도록 구현
+        - 단, Master 컨테이너가 예기치 않게 종료된 원인은 끝내 규명하지 못해 개선 과제로 남김
+- BE
+    - DB에 시간이 `UTC-9`가 아닌 `UTC`로 저장되는 문제 발생
+        - PostgreSQL과 EC2 인스턴스의 Time Zone을 `Asia/Seoul`로 설정했음에도 Spring Boot 애플리케이션은 여전히 UTC로 동작
+        - 원인은 Spring Boot가 JVM 기본 Time Zone을 따라가기 때문에, 서버 및 DB 설정만으로는 적용되지 않음을 확인
+        - 애플리케이션 실행 시 `@PostConstruct`를 통해 JVM TimeZone을 `Asia/Seoul`로 설정하여 문제 해결
+
+## **[성과 & 배운 점]**
+
+- 실제 사용자 피드백에서 직관적이고 사용하기 편리하다는 평가
+- Redis 캐싱 및 Sentinel 적용으로 응답 속도와 가용성 개선
+- HTTPS 적용 및 CI/CD 자동화 배포 경험으로 보안 및 개발 효율성 향상
+- 설계와 구조적 접근이 프로젝트 완성도에 큰 영향을 미침을 체감
+- 코드 리뷰와 협업을 통해 더 나은 코드 품질 및 팀워크 경험
+
+## **[주요 화면]**
+
+- 쉽고 빠른 티켓 응모 & 양도
+    - 응모
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin: 2rem 0;">
+        <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px; max-width: 400px; display: flex; justify-content: center;">
+                <img src={apply1.src} alt="응모화면1" style="max-width: 100%; height: auto;" />
+            </div>
+            <div style="flex: 1; min-width: 300px; max-width: 400px; display: flex; justify-content: center;">
+                <img src={apply2.src} alt="응모화면2" style="max-width: 100%; height: auto;" />
+            </div>
+            <div style="flex: 1; min-width: 300px; max-width: 400px; display: flex; justify-content: center;">
+                <Image src={apply3} alt="응모화면3" />
+            </div>
+        </div>
+        <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px; max-width: 400px; display: flex; justify-content: center;">
+                <Image src={apply4} alt="응모화면4" />
+            </div>
+            <div style="flex: 1; min-width: 300px; max-width: 400px; display: flex; justify-content: center;">
+                <Image src={apply5} alt="응모화면5" />
+            </div>
+            <div style="flex: 1; min-width: 300px; max-width: 400px; display: flex; justify-content: center;">
+                <Image src={apply6} alt="응모화면6" />
+            </div>
+        </div>
+    </div>
+    - 양도
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin: 2rem 0;">
+        <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; max-width: 100%;">
+            <div style="flex: 1; min-width: 300px; max-width: calc(50% - 0.75rem); display: flex; justify-content: center;">
+                <img src={assignment1.src} alt="양도화면1" style="max-width: 100%; height: auto; width: 100%; object-fit: contain;" />
+            </div>
+            <div style="flex: 1; min-width: 300px; max-width: calc(50% - 0.75rem); display: flex; justify-content: center;">
+                <img src={assignment2.src} alt="양도화면2" style="max-width: 100%; height: auto; width: 100%; object-fit: contain;" />
+            </div>
+        </div>
+        <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; max-width: 100%;">
+            <div style="flex: 1; min-width: 300px; max-width: calc(33.333% - 1rem); display: flex; justify-content: center;">
+                <Image src={assignment3} alt="양도화면3" />
+            </div>
+            <div style="flex: 1; min-width: 300px; max-width: calc(33.333% - 1rem); display: flex; justify-content: center;">
+                <Image src={assignment4} alt="양도화면4" />
+            </div>
+            <div style="flex: 1; min-width: 300px; max-width: calc(33.333% - 1rem); display: flex; justify-content: center;">
+                <Image src={assignment5} alt="양도화면5" />
+            </div>
+        </div>
+    </div>
+
+- 선호 팀별 테마 적용
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin: 2rem 0;">
+        <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; max-width: 100%;">
+            <div style="flex: 1; min-width: 300px; max-width: calc(100% - 1.5rem); display: flex; justify-content: center;">
+                <img src={theme1.src} alt="테마적용1" style="max-width: 100%; height: auto; width: 100%; object-fit: contain;" />
+            </div>
+        </div>
+        <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; max-width: 100%;">
+            <div style="flex: 1; min-width: 300px; max-width: calc(50% - 0.75rem); display: flex; justify-content: center;">
+                <Image src={theme2} alt="테마적용2" />
+            </div>
+            <div style="flex: 1; min-width: 300px; max-width: calc(50% - 0.75rem); display: flex; justify-content: center;">
+                <Image src={theme3} alt="테마적용3" />
+            </div>
+        </div>
+    </div>
+
+- 입장권 생성  
+    ![입장권생성](/src/assets/projects/GOLDEN_TICKET/GOLDENTICKET_Ticket.webp)
+
+- 챗봇
+    <div style="display: flex; gap: 1.5rem; justify-content: center; align-items: center; flex-wrap: wrap; margin: 2rem 0;">
+        <div style="display: flex; align-items: center;">
+            <img src={chatbot1.src} alt="챗봇1" style="height: 400px; width: auto; object-fit: contain;" />
+        </div>
+        <div style="display: flex; align-items: center;">
+            <img src={chatbot2.src} alt="챗봇2" style="height: 400px; width: auto; object-fit: contain;" />
+        </div>
+    </div>
+
+## **[아키텍처 구조]**
+
+![아키텍처구조](/src/assets/projects/GOLDEN_TICKET/GOLDENTICKET_Architecture.webp)
+
+## [ERD]
+
+![ERD](/src/assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp)
+
+## [회고]
+
+### Best Practice
+
+- DB는 정규화를 지켜서 잘 설계하였다고 생각이 됨
+- 필수적인 기능들을 잘 구현하였음
+- 빠른 MVP 배포를 통해 실 사용자 피드백을 받아 UI/UX를 개선한 것이 좋았음
+- 환경변수 관리가 잘 되었음. `.env` 파일과 `Gitlab Variable`로 환경 변수를 외부에서 주입하였는데, 보안적으로 잘 관리가 되었다고 생각함
+
+### Lesson Learned
+
+- 백엔드 개발에 다양한 기술 스택을 사용하지 못하여서 아쉬웠음
+- 백엔드 프로젝트를 설계할 때 계층형 구조로 설계를 하였는데, 프로젝트가 점점 커지게 되면서 원하는 파일을 찾기가 힘들어졌음. 다음 프로젝트에는 도메인형 패키지 구조를 도입해보고자 함
+- 프론트엔드와 소통이 부족했다고 생각됨. 충분한 설계를 하지 않고 백엔드를 먼저 구축하였는데, 프론트엔드가 개발됨에 따라 API를 수정해야 할 일이 많이 생기게 되었음. 백엔드 코드가 수정되면서 상대적으로 코드가 복잡해지게 되었음
+- EC2에 처음 배포를 해보았는데, 생각보다 어려웠음. Docker와 AWS 공부가 조금 더 필요하다는 생각이 들었음
+- Redis Sentinel을 적용해 Failover 구조를 구축했지만, 문제가 발생한 근본적인 원인이 무엇인지 해결하지 못해 아쉬움
+- Kafka를 적용하고자 하였으나 개발 시간이 부족하여 적용하지 못하여 아쉬움
+- 프로젝트를 진행하면서, 브랜치 관리가 조금 아쉬웠음. 사용한 브랜치는 삭제하면서 관리가 필요하다고 생각함

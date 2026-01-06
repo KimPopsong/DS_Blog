@@ -12,10 +12,11 @@ const resumeEntry = resumeEntries[0]; // 첫 번째 resume 파일 사용
 // 프로젝트 컬렉션 가져오기
 const allProjects = await getCollection('project');
 // 지정된 순서대로 정렬: PICA, 골든티켓, TODO, 머지?, 책 찾는 여우
-const projectOrder = ['pica', 'golden-ticket', 'todo', 'merge', 'book-fox'];
+const projectOrder = ['PICA', 'GOLDEN_TICKET', 'todo', 'merge', 'book-fox'];
 const sortedProjects = projectOrder
-	.map(id => allProjects.find(p => p.id === id))
-	.filter(Boolean);
+	.map(id => allProjects.find(p => p.id === id || p.id.toLowerCase() === id.toLowerCase()))
+	.filter(Boolean)
+	.concat(allProjects.filter(p => !projectOrder.some(orderId => p.id === orderId || p.id.toLowerCase() === orderId.toLowerCase())));
 
 // 프로젝트 데이터 준비 (이미지 URL 포함)
 	const projectsData = sortedProjects

@@ -10,7 +10,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 const allProjects = await getCollection('project');
 
 // 지정된 순서대로 정렬: PICA, 골든티켓, TODO, 머지?, 책 찾는 여우
-const projectOrder = ['PICA', 'GOLDEN_TICKET', 'todo', 'merge', 'book-fox'];
+const projectOrder = ['PICA', 'GOLDEN_TICKET', 'TODO', 'MERGE', 'FOX_BOOK_FINDER'];
 const sortedProjects = projectOrder
 	.map(id => allProjects.find(p => p.id === id || p.id.toLowerCase() === id.toLowerCase()))
 	.filter(Boolean)

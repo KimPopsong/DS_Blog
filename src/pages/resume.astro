@@ -1,8 +1,19 @@
 ---
+import { getCollection, render } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+// Resume 마크다운 파일 가져오기
+const resumeEntries = await getCollection('resume');
+const resumeEntry = resumeEntries[0]; // 첫 번째 resume 파일 사용
+
+let Content;
+if (resumeEntry) {
+	const rendered = await render(resumeEntry);
+	Content = rendered.Content;
+}
 ---
 
 <!doctype html>
@@ -11,29 +22,264 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<BaseHead title={`Resume | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
 			main {
-				max-width: 1200px;
+				max-width: 1400px;
 				margin: 0 auto;
-				padding: 4rem 2rem;
+				padding: 4rem 2em;
 			}
 			.resume-content {
 				background: var(--card-bg);
 				border: 1px solid var(--card-border);
 				border-radius: 20px;
-				padding: 3rem;
+				padding: 4rem 4rem;
 				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
+				width: 100%;
 			}
-			.resume-content p {
-				font-size: 1.2rem;
+			.resume-content :global(h1) {
+				font-size: 2.5rem;
+				font-weight: 700;
+				margin: 0 0 1rem 0;
+				color: rgb(var(--black));
+				line-height: 1.2;
+			}
+			.resume-content :global(blockquote) {
+				margin: 1.5rem 0 3rem 0;
+				padding: 0;
+				border-left: none;
+				font-size: 1.1rem;
 				color: rgb(var(--gray-dark));
 				line-height: 1.8;
-				margin: 0;
+				font-style: italic;
+			}
+			.resume-content :global(blockquote p) {
+				margin: 0.5rem 0;
+			}
+			.resume-content :global(h2) {
+				font-size: 1.5rem;
+				font-weight: 600;
+				margin: 3rem 0 1.5rem 0;
+				color: rgb(var(--black));
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			.resume-content :global(hr) {
+				border: none;
+				border-top: 1px solid var(--card-border);
+				margin: 2rem 0;
+			}
+			.resume-content :global(h3) {
+				font-size: 1.2rem;
+				margin: 1.5rem 0 0.75rem 0;
+				color: rgb(var(--black));
+				font-weight: 600;
+			}
+			.resume-content :global(p) {
+				font-size: 1rem;
+				color: rgb(var(--gray-dark));
+				line-height: 1.8;
+				margin: 0.75rem 0;
+			}
+			.resume-content :global(strong) {
+				font-weight: 600;
+				color: rgb(var(--black));
+			}
+			.resume-content :global(ul), .resume-content :global(ol) {
+				margin: 1rem 0;
+				padding-left: 1.5rem;
+			}
+			.resume-content :global(li) {
+				margin: 0.5rem 0;
+				color: rgb(var(--gray-dark));
+				line-height: 1.8;
+				font-size: 1rem;
+			}
+			.resume-content :global(img) {
+				border-radius: 12px;
+				border: 1px solid var(--card-border);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			}
+			/* 프로필 섹션 레이아웃 */
+			.resume-content :global(.profile-container) {
+				display: flex;
+				gap: 2rem;
+				align-items: flex-start;
+				margin: 2rem 0;
+			}
+			.resume-content :global(.profile-image) {
+				flex-shrink: 0;
+			}
+			.resume-content :global(.profile-info) {
+				flex: 1;
+			}
+			/* 인라인 스타일이 있는 div도 지원 */
+			.resume-content :global(div[style*="display: flex"]) {
+				display: flex !important;
+				gap: 2rem;
+				align-items: flex-start;
+				margin: 2rem 0;
+			}
+			.resume-content :global(div[style*="display: flex"] > div:first-child) {
+				flex-shrink: 0;
+			}
+			.resume-content :global(div[style*="display: flex"] > div:last-child) {
+				flex: 1;
+			}
+			.resume-content :global(a) {
+				color: var(--accent);
+				text-decoration: none;
+				transition: color 0.3s ease;
+			}
+			.resume-content :global(a:hover) {
+				color: var(--accent-glow);
+				text-decoration: underline;
+			}
+			/* Profile 섹션 스타일 - 이미지와 텍스트를 나란히 배치 */
+			.resume-content :global(h2:has(+ hr)) {
+				margin-top: 3rem;
+			}
+			/* 프로필 이미지 다음에 오는 정보들을 깔끔하게 정리 */
+			/* 프로필 정보 스타일 */
+			.resume-content :global(p:has(strong)) {
+				margin-top: 1.25rem;
+				margin-bottom: 0.5rem;
+			}
+			.resume-content :global(p:has(strong) + p) {
+				margin-top: 0;
+				margin-bottom: 1.25rem;
+			}
+			/* Activities 섹션 날짜 스타일 */
+			.resume-content :global(p:not(:has(strong)):not(:has(a))) {
+				margin: 0.5rem 0;
+			}
+			/* 다운로드 버튼 섹션 */
+			.download-section {
+				display: flex;
+				justify-content: center;
+				margin-top: 3rem;
+				padding-top: 2rem;
+			}
+			.download-button {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				padding: 1rem 2rem;
+				background: var(--accent);
+				border: 1px solid var(--accent);
+				border-radius: 12px;
+				color: rgb(var(--black));
+				font-size: 1rem;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				box-shadow: var(--neon-glow);
+			}
+			.download-button:hover {
+				background: var(--accent-glow);
+				transform: translateY(-2px);
+				box-shadow: var(--neon-glow), 0 10px 30px rgba(79, 140, 255, 0.4);
+			}
+			.download-button:active {
+				transform: translateY(0);
+			}
+			.download-button svg {
+				flex-shrink: 0;
+			}
+			/* PDF 생성용 스타일 */
+			.resume-content.pdf-mode {
+				box-shadow: none !important;
+				border: none !important;
+				border-radius: 0 !important;
+				padding: 2rem !important;
+				background: #0f1423 !important;
+				max-width: 100% !important;
+				width: 100% !important;
+			}
+			@media print {
+				header, footer, .download-section {
+					display: none !important;
+				}
+				.resume-content {
+					box-shadow: none;
+					border: none;
+					padding: 2rem;
+				}
+			}
+			@media (max-width: 1024px) {
+				main {
+					padding: 3rem 1.5em;
+				}
+				.resume-content {
+					padding: 3rem 3rem;
+					max-width: 100%;
+				}
 			}
 			@media (max-width: 720px) {
 				main {
-					padding: 2rem 1rem;
+					padding: 2rem 1em;
 				}
 				.resume-content {
-					padding: 2rem 1.5rem;
+					padding: 2rem 2rem;
+					border-radius: 16px;
+				}
+				.resume-content :global(h1) {
+					font-size: 2rem;
+				}
+				.resume-content :global(blockquote) {
+					font-size: 1rem;
+					margin: 1rem 0 2rem 0;
+				}
+				.resume-content :global(h2) {
+					font-size: 1.3rem;
+					margin: 2.5rem 0 1.25rem 0;
+				}
+				.resume-content :global(h3) {
+					font-size: 1.1rem;
+				}
+				.resume-content :global(p) {
+					font-size: 0.95rem;
+				}
+				.resume-content :global(li) {
+					font-size: 0.95rem;
+				}
+				.resume-content :global(.profile-container),
+				.resume-content :global(div[style*="display: flex"]) {
+					flex-direction: column !important;
+					gap: 1.5rem;
+				}
+				.resume-content :global(.profile-image),
+				.resume-content :global(div[style*="display: flex"] > div:first-child) {
+					align-self: center;
+				}
+			}
+			@media (max-width: 480px) {
+				main {
+					padding: 1.5rem 0.75em;
+				}
+				.resume-content {
+					padding: 1.5rem 1.5rem;
+					border-radius: 16px;
+				}
+				.resume-content :global(h1) {
+					font-size: 1.75rem;
+				}
+				.resume-content :global(blockquote) {
+					font-size: 0.95rem;
+				}
+				.resume-content :global(h2) {
+					font-size: 1.2rem;
+					margin: 2rem 0 1rem 0;
+				}
+				.resume-content :global(h3) {
+					font-size: 1rem;
+				}
+				.resume-content :global(p) {
+					font-size: 0.9rem;
+				}
+				.resume-content :global(li) {
+					font-size: 0.9rem;
+				}
+				.resume-content :global(img) {
+					max-width: 200px;
 				}
 			}
 		</style>
@@ -41,11 +287,144 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 	<body>
 		<Header />
 		<main>
-			<div class="resume-content">
-				<p>안녕하세요</p>
+			<div class="resume-content" id="resume-content">
+				{Content ? <Content /> : <p>이력서를 작성해주세요.</p>}
+			</div>
+			<div class="download-section">
+				<button id="download-pdf" class="download-button">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+						<polyline points="7 10 12 15 17 10"></polyline>
+						<line x1="12" y1="15" x2="12" y2="3"></line>
+					</svg>
+					다운로드
+				</button>
 			</div>
 		</main>
 		<Footer />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				const downloadButton = document.getElementById('download-pdf');
+				const resumeContent = document.getElementById('resume-content');
+				
+				if (downloadButton && resumeContent) {
+					downloadButton.addEventListener('click', async function() {
+						// 버튼 비활성화
+						downloadButton.disabled = true;
+						const originalHTML = downloadButton.innerHTML;
+						downloadButton.innerHTML = '<span>PDF 생성 중...</span>';
+						
+						try {
+							// 이미지 로딩 대기
+							const images = resumeContent.querySelectorAll('img');
+							await Promise.all(
+								Array.from(images).map(img => {
+									if (img.complete && img.naturalHeight !== 0) return Promise.resolve();
+									return new Promise((resolve) => {
+										img.onload = resolve;
+										img.onerror = resolve; // 에러가 나도 계속 진행
+										setTimeout(resolve, 5000); // 최대 5초 대기
+									});
+								})
+							);
+							
+							// PDF 모드 클래스 추가 (스타일 보정용)
+							resumeContent.classList.add('pdf-mode');
+							
+							// PDF 옵션 설정
+							const opt = {
+								margin: [15, 15, 15, 15],
+								filename: '김대성_이력서.pdf',
+								image: { 
+									type: 'jpeg', 
+									quality: 0.95 
+								},
+								html2canvas: { 
+									scale: 2,
+									useCORS: true,
+									allowTaint: false,
+									letterRendering: true,
+									backgroundColor: '#0f1423',
+									width: resumeContent.scrollWidth,
+									height: resumeContent.scrollHeight,
+									windowWidth: resumeContent.scrollWidth,
+									windowHeight: resumeContent.scrollHeight,
+									x: 0,
+									y: 0,
+									scrollX: 0,
+									scrollY: 0,
+									logging: false,
+									onclone: function(clonedDoc) {
+										// 클론된 문서에서 스타일 보정
+										const clonedContent = clonedDoc.getElementById('resume-content');
+										if (clonedContent) {
+											// PDF용 스타일 적용
+											clonedContent.style.width = resumeContent.scrollWidth + 'px';
+											clonedContent.style.maxWidth = '100%';
+											clonedContent.style.boxShadow = 'none';
+											clonedContent.style.border = 'none';
+											clonedContent.style.borderRadius = '0';
+											clonedContent.style.padding = '2rem';
+											clonedContent.style.background = '#0f1423';
+											clonedContent.style.margin = '0';
+											
+											// 모든 이미지가 로드되었는지 확인
+											const imgs = clonedContent.querySelectorAll('img');
+											imgs.forEach(img => {
+												img.style.maxWidth = '100%';
+												img.style.height = 'auto';
+												img.style.display = 'block';
+											});
+											
+											// 모든 텍스트 스타일 보정
+											const allElements = clonedContent.querySelectorAll('*');
+											allElements.forEach(el => {
+												el.style.transform = 'none';
+												el.style.transition = 'none';
+											});
+										}
+									}
+								},
+								jsPDF: { 
+									unit: 'mm', 
+									format: 'a4', 
+									orientation: 'portrait',
+									compress: true
+								},
+								pagebreak: { 
+									mode: ['avoid-all', 'css', 'legacy'],
+									before: '.page-break-before',
+									after: '.page-break-after',
+									avoid: ['img', '.profile-container']
+								}
+							};
+							
+							// PDF 생성 및 다운로드
+							await html2pdf()
+								.set(opt)
+								.from(resumeContent)
+								.save();
+							
+							// PDF 모드 클래스 제거
+							resumeContent.classList.remove('pdf-mode');
+							
+							// 완료 후 버튼 복원
+							downloadButton.disabled = false;
+							downloadButton.innerHTML = originalHTML;
+						} catch (error) {
+							console.error('PDF 생성 오류:', error);
+							// PDF 모드 클래스 제거
+							if (resumeContent) {
+								resumeContent.classList.remove('pdf-mode');
+							}
+							alert('PDF 생성 중 오류가 발생했습니다: ' + error.message);
+							downloadButton.disabled = false;
+							downloadButton.innerHTML = originalHTML;
+						}
+					});
+				}
+			});
+		</script>
 	</body>
 </html>
-

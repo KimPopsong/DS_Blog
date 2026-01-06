@@ -22,12 +22,35 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				padding: 3rem;
 				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
 			}
+			@media (max-width: 1024px) {
+				main {
+					padding: 3rem 1.5rem;
+				}
+				.project-content {
+					padding: 2.5rem 2rem;
+				}
+			}
 			@media (max-width: 720px) {
 				main {
 					padding: 2rem 1rem;
 				}
 				.project-content {
 					padding: 2rem 1.5rem;
+				}
+				.project-content h1 {
+					font-size: 2rem;
+				}
+			}
+			@media (max-width: 480px) {
+				main {
+					padding: 1.5rem 0.75rem;
+				}
+				.project-content {
+					padding: 1.5rem 1rem;
+					border-radius: 16px;
+				}
+				.project-content h1 {
+					font-size: 1.75rem;
 				}
 			}
 		</style>

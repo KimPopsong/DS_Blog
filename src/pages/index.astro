@@ -92,19 +92,62 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				line-height: 1.7;
 				margin: 0;
 			}
+			@media (max-width: 1024px) {
+				main {
+					padding: 4rem 1.5rem;
+				}
+				.hero-title {
+					font-size: 4rem;
+				}
+			}
 			@media (max-width: 720px) {
 				main {
 					padding: 3rem 1rem;
 				}
+				.hero-section {
+					margin-bottom: 4rem;
+				}
 				.hero-title {
-					font-size: 3rem;
+					font-size: 2.5rem;
+					margin-bottom: 1rem;
 				}
 				.hero-subtitle {
-					font-size: 1.2rem;
+					font-size: 1.1rem;
+					margin-bottom: 2rem;
+				}
+				.cta-button {
+					padding: 1rem 2rem;
+					font-size: 1rem;
+					width: 100%;
+					text-align: center;
 				}
 				.features-grid {
 					grid-template-columns: 1fr;
 					gap: 1.5rem;
+					margin-top: 3rem;
+				}
+				.feature-card {
+					padding: 2rem 1.5rem;
+				}
+				.feature-icon {
+					font-size: 2.5rem;
+				}
+				.feature-title {
+					font-size: 1.3rem;
+				}
+			}
+			@media (max-width: 480px) {
+				main {
+					padding: 2rem 1rem;
+				}
+				.hero-title {
+					font-size: 2rem;
+				}
+				.hero-subtitle {
+					font-size: 1rem;
+				}
+				.feature-card {
+					padding: 1.5rem 1rem;
 				}
 			}
 		</style>

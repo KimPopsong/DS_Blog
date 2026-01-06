@@ -22,7 +22,10 @@ const ogImage = image ? new URL(image.src, Astro.url) : defaultOGImage;
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<!-- Favicons -->
+<link rel="icon" type="image/svg+xml" href={new URL('/favicon.svg', Astro.site)} />
+<link rel="apple-touch-icon" sizes="180x180" href={new URL('/og.png', Astro.site)} />
+<link rel="shortcut icon" href={new URL('/favicon.svg', Astro.site)} />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
 	rel="alternate"

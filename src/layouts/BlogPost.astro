@@ -7,9 +7,9 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<'blog' | 'project'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage, tags } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tags, startDate, endDate } = Astro.props;
 
 // 페이지 경로에 따라 타이틀 설정
 const pathname = Astro.url.pathname;
@@ -65,8 +65,11 @@ if (pathname.includes('/about')) {
 				background: var(--card-bg);
 				border: 1px solid var(--card-border);
 				border-radius: 20px;
-				margin: -4rem 0 0 0;
+				margin: 0;
 				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
+			}
+			.hero-section + .article-header {
+				margin: -4rem 0 0 0;
 			}
 			.article-title {
 				margin: 0 0 1.5rem 0;
@@ -145,8 +148,10 @@ if (pathname.includes('/about')) {
 				main {
 					padding: 3em 1.5em;
 				}
-				.article-header {
+				.hero-section + .article-header {
 					margin: -3rem 0 0 0;
+				}
+				.article-header {
 					padding: 2.5rem 2rem;
 				}
 				.article-title {
@@ -157,8 +162,10 @@ if (pathname.includes('/about')) {
 				main {
 					padding: 2em 1em;
 				}
-				.article-header {
+				.hero-section + .article-header {
 					margin: -2rem 0 0 0;
+				}
+				.article-header {
 					padding: 2rem 1.5rem;
 				}
 				.article-title {
@@ -193,8 +200,10 @@ if (pathname.includes('/about')) {
 				main {
 					padding: 1.5em 0.75em;
 				}
-				.article-header {
+				.hero-section + .article-header {
 					margin: -1.5rem 0 0 0;
+				}
+				.article-header {
 					padding: 1.5rem 1rem;
 				}
 				.article-title {
@@ -237,9 +246,15 @@ if (pathname.includes('/about')) {
 								))}
 							</div>
 						)}
-						<div class="date">
-							<FormattedDate date={pubDate} />
-						</div>
+						{startDate && endDate ? (
+							<div class="date">
+								{startDate.toISOString().split('T')[0]} ~ {endDate.toISOString().split('T')[0]}
+							</div>
+						) : (
+							<div class="date">
+								<FormattedDate date={pubDate} />
+							</div>
+						)}
 						{updatedDate && (
 							<div class="last-updated-on">
 								업데이트: <FormattedDate date={updatedDate} />

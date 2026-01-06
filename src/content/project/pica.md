@@ -1,6 +1,8 @@
 ---
 title: "PICA"
 pubDate: 2025-01-01T00:00+09:00
+startDate: 2025-08-11
+endDate: 2025-09-17
 description: "PICA 프로젝트 설명"
 heroImage: '../../assets/blog-placeholder-1.jpg'
 tags: ["프로젝트"]

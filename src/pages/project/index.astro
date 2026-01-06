@@ -169,7 +169,13 @@ const sortedProjects = projectOrder
 							<h2>{project.data.title}</h2>
 							<p>{project.data.description}</p>
 							<div class="project-meta">
-								<FormattedDate date={project.data.pubDate} />
+								{project.data.startDate && project.data.endDate ? (
+									<span>
+										{project.data.startDate.toISOString().split('T')[0]} ~ {project.data.endDate.toISOString().split('T')[0]}
+									</span>
+								) : (
+									<FormattedDate date={project.data.pubDate} />
+								)}
 							</div>
 							{project.data.tags && project.data.tags.length > 0 && (
 								<div class="project-tags">

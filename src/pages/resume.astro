@@ -9,6 +9,37 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 const resumeEntries = await getCollection('resume');
 const resumeEntry = resumeEntries[0]; // 첫 번째 resume 파일 사용
 
+// 프로젝트 컬렉션 가져오기
+const allProjects = await getCollection('project');
+// 지정된 순서대로 정렬: PICA, 골든티켓, TODO, 머지?, 책 찾는 여우
+const projectOrder = ['pica', 'golden-ticket', 'todo', 'merge', 'book-fox'];
+const sortedProjects = projectOrder
+	.map(id => allProjects.find(p => p.id === id))
+	.filter(Boolean);
+
+// 프로젝트 데이터 준비 (이미지 URL 포함)
+const projectsData = sortedProjects
+	.filter((project): project is NonNullable<typeof project> => project !== undefined)
+	.map((project) => {
+		let imageUrl = '';
+		if (project.data.heroImage) {
+			// 이미지 객체에서 src 속성 추출
+			const image = project.data.heroImage;
+			imageUrl = typeof image === 'object' && 'src' in image ? image.src : '';
+		}
+		return {
+			id: project.id,
+			title: project.data.title,
+			description: project.data.description,
+			pubDate: project.data.pubDate.toISOString(),
+			startDate: project.data.startDate?.toISOString() || null,
+			endDate: project.data.endDate?.toISOString() || null,
+			tags: project.data.tags || [],
+			imageUrl: imageUrl,
+			url: `/project/${project.id}`
+		};
+	});
+
 let Content;
 if (resumeEntry) {
 	const rendered = await render(resumeEntry);
@@ -77,7 +108,7 @@ if (resumeEntry) {
 			.resume-content :global(h2) {
 				font-size: 1.5rem;
 				font-weight: 600;
-				margin: 2rem 0 1rem 0;
+				margin: 1.25rem 0 0.75rem 0;
 				color: rgb(var(--black));
 				display: flex;
 				align-items: center;
@@ -86,7 +117,7 @@ if (resumeEntry) {
 			.resume-content :global(hr) {
 				border: none;
 				border-top: 1px solid var(--card-border);
-				margin: 2rem 0;
+				margin: 1.25rem 0;
 			}
 			.resume-content :global(h3) {
 				font-size: 1.2rem;
@@ -137,6 +168,15 @@ if (resumeEntry) {
 			}
 			.resume-content :global(.profile-info > p:first-child:has(strong)) {
 				margin-top: 0 !important;
+			}
+			/* Profile 정보 간격 줄이기 - 사진 높이에 맞추기 */
+			.resume-content :global(.profile-info p:has(strong)) {
+				margin-top: 0.5rem !important;
+				margin-bottom: 0.25rem !important;
+			}
+			.resume-content :global(.profile-info p:has(strong) + p) {
+				margin-top: 0 !important;
+				margin-bottom: 0.5rem !important;
 			}
 			/* Activities 섹션 레이아웃 */
 			.resume-content :global(.activities-container) {
@@ -303,6 +343,158 @@ if (resumeEntry) {
 			.resume-content :global(.etc-right > ul > li:first-child) {
 				margin-top: 0;
 			}
+			/* Skills and Tools 섹션 레이아웃 */
+			.resume-content :global(.skills-container) {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				margin: 2rem 0;
+			}
+			.resume-content :global(.skill-category) {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+			.resume-content :global(.skill-category h3) {
+				font-size: 1.1rem;
+				font-weight: 600;
+				margin: 0 0 0.25rem 0;
+				color: rgb(var(--black));
+				border-bottom: 1px solid var(--card-border);
+				padding-bottom: 0.25rem;
+			}
+			.resume-content :global(.skill-item) {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				gap: 1rem;
+				margin-bottom: 0;
+				padding: 0.4rem 0.75rem;
+				background: rgba(79, 140, 255, 0.03);
+				border: 1px solid var(--card-border);
+				border-radius: 6px;
+			}
+			.resume-content :global(.skill-name) {
+				font-weight: 600;
+				color: var(--accent-glow);
+				font-size: 1rem;
+				flex-shrink: 0;
+			}
+			.resume-content :global(.skill-rating) {
+				display: flex;
+				gap: 0.15rem;
+				align-items: center;
+				flex-shrink: 0;
+			}
+			.resume-content :global(.skill-rating .star) {
+				font-size: 1rem;
+				color: var(--accent);
+				line-height: 1;
+			}
+			.resume-content :global(.skill-rating .star.filled) {
+				color: var(--accent-glow);
+				text-shadow: 0 0 6px rgba(107, 163, 255, 0.4);
+			}
+			.resume-content :global(.skills-description) {
+				margin-top: 1.5rem;
+				padding: 1.25rem;
+				background: rgba(79, 140, 255, 0.05);
+				border: 1px solid var(--card-border);
+				border-radius: 8px;
+			}
+			.resume-content :global(.skills-description ul) {
+				margin: 0;
+				padding-left: 1.5rem;
+				list-style-type: disc;
+			}
+			.resume-content :global(.skills-description li) {
+				margin: 0.5rem 0;
+				color: rgb(var(--gray-dark));
+				line-height: 1.7;
+				font-size: 0.95rem;
+			}
+			.resume-content :global(.skills-description li:first-child) {
+				margin-top: 0;
+			}
+			.resume-content :global(.skills-description li:last-child) {
+				margin-bottom: 0;
+			}
+			/* Projects 섹션 레이아웃 - 그리드 카드 형식 */
+			.resume-content :global(.projects-container) {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 2rem;
+				margin: 2rem 0;
+			}
+			.resume-content :global(.project-card) {
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 20px;
+				overflow: hidden;
+				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
+				transition: all 0.3s ease;
+				text-decoration: none;
+				color: inherit;
+				display: flex;
+				flex-direction: column;
+			}
+			.resume-content :global(.project-card:hover) {
+				transform: translateY(-5px);
+				box-shadow: var(--neon-glow), 0 25px 70px rgba(79, 140, 255, 0.3);
+				border-color: var(--accent);
+			}
+			.resume-content :global(.project-card-image) {
+				width: 100%;
+				height: 200px;
+				overflow: hidden;
+				background: var(--card-bg);
+			}
+			.resume-content :global(.project-card-image img) {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+			.resume-content :global(.project-card-content) {
+				padding: 1.5rem;
+				display: flex;
+				flex-direction: column;
+				gap: 0.75rem;
+				flex: 1;
+			}
+			.resume-content :global(.project-card-title) {
+				font-size: 1.25rem;
+				font-weight: 600;
+				margin: 0;
+				color: rgb(var(--black));
+				line-height: 1.4;
+			}
+			.resume-content :global(.project-card-description) {
+				font-size: 0.95rem;
+				color: rgb(var(--gray-dark));
+				line-height: 1.6;
+				margin: 0;
+				flex: 1;
+			}
+			.resume-content :global(.project-card-tags) {
+				display: flex;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+				margin-top: 0.5rem;
+			}
+			.resume-content :global(.project-card-tag) {
+				padding: 0.25rem 0.75rem;
+				background: rgba(79, 140, 255, 0.1);
+				border: 1px solid var(--card-border);
+				border-radius: 12px;
+				font-size: 0.85rem;
+				color: var(--accent);
+			}
+			.resume-content :global(.project-card-date) {
+				font-size: 0.85rem;
+				color: rgb(var(--gray));
+				margin-top: 0.5rem;
+			}
 			/* 인라인 스타일이 있는 div도 지원 */
 			.resume-content :global(div[style*="display: flex"]) {
 				display: flex !important;
@@ -327,7 +519,7 @@ if (resumeEntry) {
 			}
 			/* Profile 섹션 스타일 - 이미지와 텍스트를 나란히 배치 */
 			.resume-content :global(h2:has(+ hr)) {
-				margin-top: 3rem;
+				margin-top: 1.75rem;
 			}
 			/* 프로필 이미지 다음에 오는 정보들을 깔끔하게 정리 */
 			/* 프로필 정보 스타일 */
@@ -386,6 +578,53 @@ if (resumeEntry) {
 				max-width: 100% !important;
 				width: 100% !important;
 				text-align: left !important;
+			}
+			/* PDF 모드에서 프로젝트 레이아웃 - float 기반 (PDF 호환성 향상) */
+			.resume-content.pdf-mode :global(.projects-container) {
+				display: block !important;
+				width: 100% !important;
+				overflow: visible !important;
+				margin: 2rem 0 !important;
+				padding: 0 !important;
+				box-sizing: border-box !important;
+			}
+			.resume-content.pdf-mode :global(.project-card) {
+				page-break-inside: avoid !important;
+				break-inside: avoid !important;
+				box-sizing: border-box !important;
+				display: block !important;
+				position: relative !important;
+				vertical-align: top !important;
+			}
+			.resume-content.pdf-mode :global(.project-card-image) {
+				width: 100% !important;
+				max-width: 100% !important;
+				height: 200px !important;
+				overflow: hidden !important;
+				display: block !important;
+			}
+			.resume-content.pdf-mode :global(.project-card-image img) {
+				width: 100% !important;
+				height: 100% !important;
+				object-fit: cover !important;
+				display: block !important;
+			}
+			.resume-content.pdf-mode :global(.project-card-content) {
+				width: 100% !important;
+				max-width: 100% !important;
+				box-sizing: border-box !important;
+				display: flex !important;
+				flex-direction: column !important;
+			}
+			.resume-content.pdf-mode :global(.project-card-title) {
+				text-align: left !important;
+			}
+			.resume-content.pdf-mode :global(.project-card-description) {
+				text-align: left !important;
+			}
+			.resume-content.pdf-mode :global(.project-card-tags) {
+				display: flex !important;
+				flex-wrap: wrap !important;
 			}
 			.resume-content.pdf-mode :global(*) {
 				text-align: left !important;
@@ -463,6 +702,9 @@ if (resumeEntry) {
 				.resume-content :global(.profile-container),
 				.resume-content :global(.activities-container),
 				.resume-content :global(.activity-item),
+				.resume-content :global(.projects-container) {
+					grid-template-columns: 1fr !important;
+				}
 				.resume-content :global(.awards-container),
 				.resume-content :global(.awards-item),
 				.resume-content :global(.certifications-container),
@@ -471,6 +713,7 @@ if (resumeEntry) {
 				.resume-content :global(.education-item),
 				.resume-content :global(.etc-container),
 				.resume-content :global(.etc-item),
+				.resume-content :global(.skills-container),
 				.resume-content :global(div[style*="display: flex"]) {
 					flex-direction: column !important;
 					gap: 1.5rem;
@@ -538,8 +781,51 @@ if (resumeEntry) {
 		</main>
 		<Footer />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-		<script>
+		<script define:vars={{ projects: projectsData }}>
 			document.addEventListener('DOMContentLoaded', function() {
+				// 프로젝트 목록 렌더링 (카드 형식)
+				const projectsContainer = document.getElementById('projects-container');
+				if (projectsContainer && projects && projects.length > 0) {
+					projectsContainer.innerHTML = projects.map(project => {
+						const imageHtml = project.imageUrl 
+							? `<div class="project-card-image"><img src="${project.imageUrl}" alt="${project.title}" /></div>`
+							: '';
+						
+						const tagsHtml = project.tags && project.tags.length > 0
+							? `<div class="project-card-tags">${project.tags.map(tag => `<span class="project-card-tag">${tag}</span>`).join('')}</div>`
+							: '';
+						
+						// 개발 기간 표시 (startDate와 endDate가 있으면 사용, 없으면 pubDate 사용)
+						let dateStr = '';
+						if (project.startDate && project.endDate) {
+							const startDate = new Date(project.startDate);
+							const endDate = new Date(project.endDate);
+							const formatDate = (date) => {
+								const year = date.getFullYear();
+								const month = String(date.getMonth() + 1).padStart(2, '0');
+								const day = String(date.getDate()).padStart(2, '0');
+								return `${year}-${month}-${day}`;
+							};
+							dateStr = `${formatDate(startDate)} ~ ${formatDate(endDate)}`;
+						} else {
+							const date = new Date(project.pubDate);
+							dateStr = date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+						}
+						
+						return `
+							<a href="${project.url}" class="project-card">
+								${imageHtml}
+								<div class="project-card-content">
+									<h3 class="project-card-title">${project.title}</h3>
+									<p class="project-card-description">${project.description || ''}</p>
+									${tagsHtml}
+									<div class="project-card-date">${dateStr}</div>
+								</div>
+							</a>
+						`;
+					}).join('');
+				}
+				
 				const downloadButton = document.getElementById('download-pdf');
 				const resumeContent = document.getElementById('resume-content');
 				
@@ -551,7 +837,7 @@ if (resumeEntry) {
 						downloadButton.innerHTML = '<span>PDF 생성 중...</span>';
 						
 						try {
-							// 이미지 로딩 대기
+							// 이미지 로딩 대기 (이미 로드된 이미지는 즉시 통과)
 							const images = resumeContent.querySelectorAll('img');
 							await Promise.all(
 								Array.from(images).map(img => {
@@ -559,13 +845,34 @@ if (resumeEntry) {
 									return new Promise((resolve) => {
 										img.onload = resolve;
 										img.onerror = resolve; // 에러가 나도 계속 진행
-										setTimeout(resolve, 5000); // 최대 5초 대기
+										setTimeout(resolve, 2000); // 최대 2초 대기 (5초 -> 2초로 단축)
 									});
 								})
 							);
 							
+							// main 요소의 실제 너비 가져오기 (resume.astro의 1000px 설정 반영)
+							const mainElement = resumeContent.closest('main');
+							let contentWidth = 1000; // 기본값: resume.astro의 max-width
+							if (mainElement) {
+								contentWidth = mainElement.offsetWidth || mainElement.clientWidth || 1000;
+							}
+							
 							// PDF 모드 클래스 추가 (스타일 보정용)
 							resumeContent.classList.add('pdf-mode');
+							
+							// 프로젝트 컨테이너 레이아웃은 클론된 문서에서만 적용하도록 변경
+							// 원본 문서는 그대로 유지하여 화면 표시에 영향 없도록 함
+							
+							// 콘텐츠 높이 계산 (PDF 모드 적용 후 레이아웃이 완전히 적용될 때까지 대기)
+							await new Promise(resolve => setTimeout(resolve, 200));
+							
+							// 여러 번 확인하여 정확한 높이 계산
+							let contentHeight = resumeContent.scrollHeight || resumeContent.offsetHeight;
+							// 한 번 더 확인 (레이아웃이 안정화될 때까지)
+							await new Promise(resolve => setTimeout(resolve, 50)); // 200ms -> 50ms로 단축
+							contentHeight = Math.max(contentHeight, resumeContent.scrollHeight || resumeContent.offsetHeight || 10000);
+							// ETC 섹션까지 포함하기 위해 추가 여유 공간 확보
+							contentHeight = contentHeight + 500; // 충분한 여유 공간 추가
 							
 							// PDF 옵션 설정
 							const opt = {
@@ -573,18 +880,18 @@ if (resumeEntry) {
 								filename: '김대성_이력서.pdf',
 								image: { 
 									type: 'jpeg', 
-									quality: 0.95 
+									quality: 0.85 // 0.95 -> 0.85로 줄여서 파일 크기와 처리 시간 단축
 								},
 								html2canvas: { 
-									scale: 2,
+									scale: 1.5, // 2 -> 1.5로 줄여서 속도 향상 (품질은 약간 떨어지지만 충분히 선명)
 									useCORS: true,
 									allowTaint: false,
-									letterRendering: true,
+									letterRendering: false, // true -> false로 변경하여 속도 향상
 									backgroundColor: '#0f1423',
-									width: resumeContent.scrollWidth,
-									height: resumeContent.scrollHeight,
-									windowWidth: resumeContent.scrollWidth,
-									windowHeight: resumeContent.scrollHeight,
+									width: contentWidth,
+									height: contentHeight, // 이미 위에서 여유 공간이 추가됨
+									windowWidth: contentWidth,
+									windowHeight: contentHeight, // 이미 위에서 여유 공간이 추가됨
 									x: 0,
 									y: 0,
 									scrollX: 0,
@@ -623,14 +930,19 @@ if (resumeEntry) {
 										// 클론된 문서에서 스타일 보정
 										const clonedContent = clonedDoc.getElementById('resume-content');
 										if (clonedContent) {
-											// PDF용 스타일 적용
-											clonedContent.style.width = resumeContent.scrollWidth + 'px';
-											clonedContent.style.maxWidth = resumeContent.scrollWidth + 'px';
-											clonedContent.style.minWidth = resumeContent.scrollWidth + 'px';
+											// PDF용 스타일 적용 - resume.astro의 1000px 설정 반영
+											clonedContent.style.width = contentWidth + 'px';
+											clonedContent.style.maxWidth = contentWidth + 'px';
+											clonedContent.style.minWidth = contentWidth + 'px';
+											clonedContent.style.height = 'auto';
+											clonedContent.style.minHeight = 'auto';
+											clonedContent.style.maxHeight = 'none';
+											clonedContent.style.overflow = 'visible';
 											clonedContent.style.boxShadow = 'none';
 											clonedContent.style.border = 'none';
 											clonedContent.style.borderRadius = '0';
 											clonedContent.style.padding = '2rem';
+											clonedContent.style.paddingBottom = '8rem'; // 하단 여유 공간 증가 (ETC 섹션 포함)
 											clonedContent.style.background = '#0f1423';
 											clonedContent.style.margin = '0 auto';
 											clonedContent.style.marginLeft = 'auto';
@@ -663,6 +975,148 @@ if (resumeEntry) {
 												el.style.transform = 'none';
 												el.style.transition = 'none';
 											});
+											
+											// 프로젝트 컨테이너에 2열 레이아웃 적용 (PDF 호환성 향상)
+											const projectsContainer = clonedContent.querySelector('.projects-container');
+											if (projectsContainer) {
+												// 컨테이너의 실제 너비 계산 (padding 2rem = 32px 제외)
+												const padding = 32; // 2rem = 32px
+												const containerWidth = contentWidth - (padding * 2); // 양쪽 padding 제외
+												const gap = 24; // 1.5rem = 24px
+												const cardWidth = Math.floor((containerWidth - gap) / 2); // 2열 레이아웃
+												
+												// 컨테이너 스타일 설정
+												projectsContainer.style.display = 'block';
+												projectsContainer.style.width = '100%';
+												projectsContainer.style.maxWidth = '100%';
+												projectsContainer.style.overflow = 'visible';
+												projectsContainer.style.margin = '2rem 0';
+												projectsContainer.style.padding = '0';
+												projectsContainer.style.boxSizing = 'border-box';
+												
+												// 기존 clearfix 제거
+												const existingClearfix = projectsContainer.querySelector('.pdf-clearfix');
+												if (existingClearfix) {
+													existingClearfix.remove();
+												}
+												
+												// 프로젝트 카드 스타일 수정 - 더 정확한 레이아웃 적용
+												const projectCards = Array.from(projectsContainer.querySelectorAll('.project-card'));
+												projectCards.forEach((card, index) => {
+													// 모든 기본 스타일 제거 후 재설정
+													card.style.cssText = '';
+													
+													// float를 사용한 2열 레이아웃
+													card.style.float = index % 2 === 0 ? 'left' : 'right';
+													card.style.width = cardWidth + 'px';
+													card.style.maxWidth = cardWidth + 'px';
+													card.style.minWidth = cardWidth + 'px';
+													card.style.marginLeft = '0';
+													card.style.marginRight = index % 2 === 0 ? gap + 'px' : '0';
+													card.style.marginTop = '0';
+													card.style.marginBottom = gap + 'px';
+													card.style.display = 'block';
+													card.style.pageBreakInside = 'avoid';
+													card.style.breakInside = 'avoid';
+													card.style.boxSizing = 'border-box';
+													card.style.position = 'relative';
+													card.style.verticalAlign = 'top';
+													
+													// 카드 배경 및 테두리
+													card.style.background = 'rgba(15, 20, 35, 0.6)';
+													card.style.border = '1px solid rgba(79, 140, 255, 0.2)';
+													card.style.borderRadius = '20px';
+													card.style.overflow = 'hidden';
+													card.style.textDecoration = 'none';
+													card.style.color = 'inherit';
+													
+													// 카드 내부 이미지 요소 조정
+													const cardImage = card.querySelector('.project-card-image');
+													if (cardImage) {
+														cardImage.style.width = '100%';
+														cardImage.style.maxWidth = '100%';
+														cardImage.style.height = '200px';
+														cardImage.style.overflow = 'hidden';
+														cardImage.style.background = 'rgba(15, 20, 35, 0.6)';
+														cardImage.style.display = 'block';
+														
+														const cardImg = cardImage.querySelector('img');
+														if (cardImg) {
+															cardImg.style.width = '100%';
+															cardImg.style.height = '100%';
+															cardImg.style.objectFit = 'cover';
+															cardImg.style.display = 'block';
+														}
+													}
+													
+													// 카드 내부 콘텐츠 요소 조정
+													const cardContent = card.querySelector('.project-card-content');
+													if (cardContent) {
+														cardContent.style.width = '100%';
+														cardContent.style.maxWidth = '100%';
+														cardContent.style.padding = '1.5rem';
+														cardContent.style.display = 'flex';
+														cardContent.style.flexDirection = 'column';
+														cardContent.style.gap = '0.75rem';
+														cardContent.style.boxSizing = 'border-box';
+													}
+													
+													// 카드 제목 스타일
+													const cardTitle = card.querySelector('.project-card-title');
+													if (cardTitle) {
+														cardTitle.style.fontSize = '1.25rem';
+														cardTitle.style.fontWeight = '600';
+														cardTitle.style.margin = '0';
+														cardTitle.style.color = 'rgb(245, 247, 250)';
+														cardTitle.style.lineHeight = '1.4';
+													}
+													
+													// 카드 설명 스타일
+													const cardDescription = card.querySelector('.project-card-description');
+													if (cardDescription) {
+														cardDescription.style.fontSize = '0.95rem';
+														cardDescription.style.color = 'rgb(200, 205, 215)';
+														cardDescription.style.lineHeight = '1.6';
+														cardDescription.style.margin = '0';
+													}
+													
+													// 카드 태그 스타일
+													const cardTags = card.querySelector('.project-card-tags');
+													if (cardTags) {
+														cardTags.style.display = 'flex';
+														cardTags.style.gap = '0.5rem';
+														cardTags.style.flexWrap = 'wrap';
+														cardTags.style.marginTop = '0.5rem';
+													}
+													
+													const cardTagItems = card.querySelectorAll('.project-card-tag');
+													cardTagItems.forEach(tag => {
+														tag.style.padding = '0.25rem 0.75rem';
+														tag.style.background = 'rgba(79, 140, 255, 0.1)';
+														tag.style.border = '1px solid rgba(79, 140, 255, 0.2)';
+														tag.style.borderRadius = '12px';
+														tag.style.fontSize = '0.85rem';
+														tag.style.color = '#4f8cff';
+													});
+													
+													// 카드 날짜 스타일
+													const cardDate = card.querySelector('.project-card-date');
+													if (cardDate) {
+														cardDate.style.fontSize = '0.85rem';
+														cardDate.style.color = 'rgb(130, 145, 170)';
+														cardDate.style.marginTop = '0.5rem';
+													}
+												});
+												
+												// clearfix 추가 (마지막 요소 이후)
+												const clearDiv = clonedDoc.createElement('div');
+												clearDiv.className = 'pdf-clearfix';
+												clearDiv.style.clear = 'both';
+												clearDiv.style.width = '100%';
+												clearDiv.style.height = '0';
+												clearDiv.style.display = 'block';
+												projectsContainer.appendChild(clearDiv);
+											}
 										}
 									}
 								},
@@ -673,10 +1127,10 @@ if (resumeEntry) {
 									compress: true
 								},
 								pagebreak: { 
-									mode: ['avoid-all', 'css', 'legacy'],
+									mode: ['css', 'legacy'],
 									before: '.page-break-before',
 									after: '.page-break-after',
-									avoid: ['img', '.profile-container']
+									avoid: ['img', '.profile-container', '.activity-item', '.awards-item', '.certification-item', '.education-item', '.etc-item', '.etc-container']
 								}
 							};
 							

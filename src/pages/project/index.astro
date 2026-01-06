@@ -1,0 +1,189 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const allProjects = await getCollection('project');
+
+// 지정된 순서대로 정렬: PICA, 골든티켓, TODO, 머지?, 책 찾는 여우
+const projectOrder = ['pica', 'golden-ticket', 'todo', 'merge', 'book-fox'];
+const sortedProjects = projectOrder
+	.map(id => allProjects.find(p => p.id === id))
+	.filter(Boolean);
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={`Project | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				max-width: 1400px;
+				width: 100%;
+				margin: 0 auto;
+				padding: 4em 2em;
+			}
+			.page-title {
+				font-size: 3.5rem;
+				font-weight: 700;
+				margin-bottom: 2rem;
+				background: linear-gradient(135deg, rgb(var(--black)) 0%, var(--accent-glow) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+			.projects-list {
+				display: flex;
+				flex-direction: column;
+				gap: 2.5rem;
+				margin-top: 3rem;
+			}
+			.project-card {
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 20px;
+				padding: 0;
+				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
+				transition: all 0.3s ease;
+				text-decoration: none;
+				display: flex;
+				overflow: hidden;
+				color: inherit;
+			}
+			.project-card:hover {
+				transform: translateY(-5px);
+				box-shadow: var(--neon-glow), 0 25px 70px rgba(79, 140, 255, 0.3);
+				border-color: var(--accent);
+			}
+			.project-image {
+				flex: 0 0 400px;
+				width: 400px;
+				height: 300px;
+				overflow: hidden;
+			}
+			.project-image img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+			.project-content {
+				flex: 1;
+				padding: 2.5rem;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+			}
+			.project-card h2 {
+				font-size: 2.5rem;
+				margin: 0 0 1rem 0;
+				color: rgb(var(--black));
+			}
+			.project-card p {
+				color: rgb(var(--gray-dark));
+				line-height: 1.8;
+				margin: 0.5rem 0;
+				font-size: 1.1rem;
+			}
+			.project-meta {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				margin-top: 1rem;
+				font-size: 0.9rem;
+				color: rgb(var(--gray));
+			}
+			.project-tags {
+				display: flex;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+				margin-top: 1rem;
+			}
+			.project-tag {
+				padding: 0.25rem 0.75rem;
+				background: rgba(79, 140, 255, 0.1);
+				border: 1px solid var(--card-border);
+				border-radius: 12px;
+				font-size: 0.85rem;
+				color: var(--accent);
+			}
+			@media (max-width: 1024px) {
+				main {
+					padding: 3em 1.5em;
+				}
+				.project-image {
+					flex: 0 0 300px;
+					width: 300px;
+					height: 250px;
+				}
+				.project-content {
+					padding: 2rem;
+				}
+				.project-card h2 {
+					font-size: 2rem;
+				}
+			}
+			@media (max-width: 720px) {
+				main {
+					padding: 2em 1em;
+				}
+				.page-title {
+					font-size: 2.5rem;
+				}
+				.projects-list {
+					gap: 2rem;
+				}
+				.project-card {
+					flex-direction: column;
+				}
+				.project-image {
+					flex: 0 0 250px;
+					width: 100%;
+					height: 250px;
+				}
+				.project-content {
+					padding: 1.5rem;
+				}
+				.project-card h2 {
+					font-size: 1.75rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1 class="page-title">Projects</h1>
+			<div class="projects-list">
+				{sortedProjects.map((project) => (
+					<a href={`/project/${project.id}`} class="project-card">
+						{project.data.heroImage && (
+							<div class="project-image">
+								<Image src={project.data.heroImage} alt={project.data.title} />
+							</div>
+						)}
+						<div class="project-content">
+							<h2>{project.data.title}</h2>
+							<p>{project.data.description}</p>
+							<div class="project-meta">
+								<FormattedDate date={project.data.pubDate} />
+							</div>
+							{project.data.tags && project.data.tags.length > 0 && (
+								<div class="project-tags">
+									{project.data.tags.map((tag) => (
+										<span class="project-tag">{tag}</span>
+									))}
+								</div>
+							)}
+						</div>
+					</a>
+				))}
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
+

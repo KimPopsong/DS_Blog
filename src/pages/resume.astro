@@ -22,10 +22,11 @@ if (resumeEntry) {
 		<BaseHead title={`Resume | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
 			body {
-				text-align: center !important;
+				margin: 0 !important;
+				padding: 0 !important;
 			}
 			main {
-				max-width: 800px !important;
+				max-width: 1000px !important;
 				width: 100% !important;
 				margin-left: auto !important;
 				margin-right: auto !important;
@@ -35,6 +36,13 @@ if (resumeEntry) {
 				display: block !important;
 				box-sizing: border-box !important;
 				text-align: left !important;
+				position: relative !important;
+			}
+			@media (max-width: 840px) {
+				main {
+					width: calc(100% - 4em) !important;
+					max-width: calc(100% - 4em) !important;
+				}
 			}
 			.resume-content {
 				background: var(--card-bg);
@@ -43,6 +51,9 @@ if (resumeEntry) {
 				padding: 4rem 4rem;
 				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
 				width: 100%;
+				box-sizing: border-box;
+				margin: 0 auto;
+				display: block;
 			}
 			.resume-content :global(h1) {
 				font-size: 2.5rem;
@@ -66,7 +77,7 @@ if (resumeEntry) {
 			.resume-content :global(h2) {
 				font-size: 1.5rem;
 				font-weight: 600;
-				margin: 3rem 0 1.5rem 0;
+				margin: 2rem 0 1rem 0;
 				color: rgb(var(--black));
 				display: flex;
 				align-items: center;
@@ -120,6 +131,177 @@ if (resumeEntry) {
 			}
 			.resume-content :global(.profile-info) {
 				flex: 1;
+			}
+			.resume-content :global(.profile-info > p:first-child) {
+				margin-top: 0 !important;
+			}
+			.resume-content :global(.profile-info > p:first-child:has(strong)) {
+				margin-top: 0 !important;
+			}
+			/* Activities 섹션 레이아웃 */
+			.resume-content :global(.activities-container) {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+				margin: 2rem 0;
+			}
+			.resume-content :global(.activity-item) {
+				display: flex;
+				gap: 2rem;
+				align-items: baseline;
+				margin-bottom: 0;
+			}
+			.resume-content :global(.activity-left) {
+				flex: 1;
+			}
+			.resume-content :global(.activity-right) {
+				flex: 1;
+			}
+			.resume-content :global(.activity-left > p:first-child) {
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+				line-height: 1.8;
+			}
+			.resume-content :global(.activity-right > ul) {
+				margin-top: 0;
+				margin-bottom: 0;
+				padding-top: 0;
+				padding-left: 1.5rem;
+			}
+			.resume-content :global(.activity-right > ul > li:first-child) {
+				margin-top: 0;
+			}
+			/* Awards 섹션 레이아웃 */
+			.resume-content :global(.awards-container) {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+				margin: 2rem 0;
+			}
+			.resume-content :global(.awards-item) {
+				display: flex;
+				gap: 2rem;
+				align-items: baseline;
+				margin-bottom: 0;
+			}
+			.resume-content :global(.awards-left) {
+				flex: 1;
+			}
+			.resume-content :global(.awards-right) {
+				flex: 1;
+			}
+			.resume-content :global(.awards-left > p:first-child) {
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+				line-height: 1.8;
+			}
+			.resume-content :global(.awards-right > ul) {
+				margin-top: 0;
+				margin-bottom: 0;
+				padding-top: 0;
+				padding-left: 1.5rem;
+			}
+			.resume-content :global(.awards-right > ul > li:first-child) {
+				margin-top: 0;
+			}
+			/* Certifications 섹션 레이아웃 */
+			.resume-content :global(.certifications-container) {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+				margin: 2rem 0;
+			}
+			.resume-content :global(.certification-item) {
+				display: flex;
+				gap: 2rem;
+				align-items: baseline;
+				margin-bottom: 0;
+			}
+			.resume-content :global(.certification-left) {
+				flex: 1;
+			}
+			.resume-content :global(.certification-right) {
+				flex: 1;
+			}
+			.resume-content :global(.certification-left > p:first-child) {
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+				line-height: 1.8;
+			}
+			.resume-content :global(.certification-right > ul) {
+				margin-top: 0;
+				margin-bottom: 0;
+				padding-top: 0;
+				padding-left: 1.5rem;
+			}
+			.resume-content :global(.certification-right > ul > li:first-child) {
+				margin-top: 0;
+			}
+			/* Educations 섹션 레이아웃 */
+			.resume-content :global(.educations-container) {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+				margin: 2rem 0;
+			}
+			.resume-content :global(.education-item) {
+				display: flex;
+				gap: 2rem;
+				align-items: baseline;
+				margin-bottom: 0;
+			}
+			.resume-content :global(.education-left) {
+				flex: 1;
+			}
+			.resume-content :global(.education-right) {
+				flex: 1;
+			}
+			.resume-content :global(.education-left > p:first-child) {
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+				line-height: 1.8;
+			}
+			.resume-content :global(.education-right > ul) {
+				margin-top: 0;
+				margin-bottom: 0;
+				padding-top: 0;
+				padding-left: 1.5rem;
+			}
+			.resume-content :global(.education-right > ul > li:first-child) {
+				margin-top: 0;
+			}
+			/* ETC 섹션 레이아웃 */
+			.resume-content :global(.etc-container) {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+				margin: 2rem 0;
+			}
+			.resume-content :global(.etc-item) {
+				display: flex;
+				gap: 2rem;
+				align-items: baseline;
+				margin-bottom: 0;
+			}
+			.resume-content :global(.etc-left) {
+				flex: 1;
+			}
+			.resume-content :global(.etc-right) {
+				flex: 1;
+			}
+			.resume-content :global(.etc-left > p:first-child) {
+				margin-top: 0 !important;
+				margin-bottom: 0 !important;
+				line-height: 1.8;
+			}
+			.resume-content :global(.etc-right > ul) {
+				margin-top: 0;
+				margin-bottom: 0;
+				padding-top: 0;
+				padding-left: 1.5rem;
+			}
+			.resume-content :global(.etc-right > ul > li:first-child) {
+				margin-top: 0;
 			}
 			/* 인라인 스타일이 있는 div도 지원 */
 			.resume-content :global(div[style*="display: flex"]) {
@@ -203,6 +385,21 @@ if (resumeEntry) {
 				background: #0f1423 !important;
 				max-width: 100% !important;
 				width: 100% !important;
+				text-align: left !important;
+			}
+			.resume-content.pdf-mode :global(*) {
+				text-align: left !important;
+			}
+			.resume-content.pdf-mode :global(h1),
+			.resume-content.pdf-mode :global(h2),
+			.resume-content.pdf-mode :global(h3),
+			.resume-content.pdf-mode :global(p),
+			.resume-content.pdf-mode :global(li),
+			.resume-content.pdf-mode :global(ul),
+			.resume-content.pdf-mode :global(ol),
+			.resume-content.pdf-mode :global(blockquote),
+			.resume-content.pdf-mode :global(div) {
+				text-align: left !important;
 			}
 			@media print {
 				header, footer, .download-section {
@@ -216,6 +413,8 @@ if (resumeEntry) {
 			}
 			@media (max-width: 1024px) {
 				main {
+					width: calc(100% - 4em) !important;
+					max-width: calc(100% - 4em) !important;
 					padding: 3rem 1.5em !important;
 					margin-left: auto !important;
 					margin-right: auto !important;
@@ -223,10 +422,14 @@ if (resumeEntry) {
 				.resume-content {
 					padding: 3rem 3rem;
 					max-width: 100%;
+					box-sizing: border-box;
+					margin: 0 auto;
 				}
 			}
 			@media (max-width: 720px) {
 				main {
+					width: calc(100% - 2em) !important;
+					max-width: calc(100% - 2em) !important;
 					padding: 2rem 1em !important;
 					margin-left: auto !important;
 					margin-right: auto !important;
@@ -234,6 +437,8 @@ if (resumeEntry) {
 				.resume-content {
 					padding: 2rem 2rem;
 					border-radius: 16px;
+					box-sizing: border-box;
+					margin: 0 auto;
 				}
 				.resume-content :global(h1) {
 					font-size: 2rem;
@@ -244,7 +449,7 @@ if (resumeEntry) {
 				}
 				.resume-content :global(h2) {
 					font-size: 1.3rem;
-					margin: 2.5rem 0 1.25rem 0;
+					margin: 1.5rem 0 0.75rem 0;
 				}
 				.resume-content :global(h3) {
 					font-size: 1.1rem;
@@ -256,6 +461,16 @@ if (resumeEntry) {
 					font-size: 0.95rem;
 				}
 				.resume-content :global(.profile-container),
+				.resume-content :global(.activities-container),
+				.resume-content :global(.activity-item),
+				.resume-content :global(.awards-container),
+				.resume-content :global(.awards-item),
+				.resume-content :global(.certifications-container),
+				.resume-content :global(.certification-item),
+				.resume-content :global(.educations-container),
+				.resume-content :global(.education-item),
+				.resume-content :global(.etc-container),
+				.resume-content :global(.etc-item),
 				.resume-content :global(div[style*="display: flex"]) {
 					flex-direction: column !important;
 					gap: 1.5rem;
@@ -267,6 +482,8 @@ if (resumeEntry) {
 			}
 			@media (max-width: 480px) {
 				main {
+					width: calc(100% - 1.5em) !important;
+					max-width: calc(100% - 1.5em) !important;
 					padding: 1.5rem 0.75em !important;
 					margin-left: auto !important;
 					margin-right: auto !important;
@@ -274,6 +491,8 @@ if (resumeEntry) {
 				.resume-content {
 					padding: 1.5rem 1.5rem;
 					border-radius: 16px;
+					box-sizing: border-box;
+					margin: 0 auto;
 				}
 				.resume-content :global(h1) {
 					font-size: 1.75rem;
@@ -283,7 +502,7 @@ if (resumeEntry) {
 				}
 				.resume-content :global(h2) {
 					font-size: 1.2rem;
-					margin: 2rem 0 1rem 0;
+					margin: 1.5rem 0 0.75rem 0;
 				}
 				.resume-content :global(h3) {
 					font-size: 1rem;
@@ -372,18 +591,52 @@ if (resumeEntry) {
 									scrollY: 0,
 									logging: false,
 									onclone: function(clonedDoc) {
+										// 클론된 문서의 html, body 스타일 수정
+										const clonedHtml = clonedDoc.documentElement;
+										const clonedBody = clonedDoc.body;
+										
+										if (clonedHtml) {
+											clonedHtml.style.margin = '0';
+											clonedHtml.style.padding = '0';
+											clonedHtml.style.textAlign = 'left';
+										}
+										
+										if (clonedBody) {
+											clonedBody.style.margin = '0';
+											clonedBody.style.padding = '0';
+											clonedBody.style.textAlign = 'left';
+											clonedBody.style.width = '100%';
+											clonedBody.style.maxWidth = '100%';
+											clonedBody.style.overflow = 'visible';
+										}
+										
+										// 클론된 문서의 main 요소 제거 또는 스타일 수정
+										const clonedMain = clonedDoc.querySelector('main');
+										if (clonedMain) {
+											clonedMain.style.margin = '0';
+											clonedMain.style.padding = '0';
+											clonedMain.style.width = 'auto';
+											clonedMain.style.maxWidth = 'none';
+											clonedMain.style.textAlign = 'left';
+										}
+										
 										// 클론된 문서에서 스타일 보정
 										const clonedContent = clonedDoc.getElementById('resume-content');
 										if (clonedContent) {
 											// PDF용 스타일 적용
 											clonedContent.style.width = resumeContent.scrollWidth + 'px';
-											clonedContent.style.maxWidth = '100%';
+											clonedContent.style.maxWidth = resumeContent.scrollWidth + 'px';
+											clonedContent.style.minWidth = resumeContent.scrollWidth + 'px';
 											clonedContent.style.boxShadow = 'none';
 											clonedContent.style.border = 'none';
 											clonedContent.style.borderRadius = '0';
 											clonedContent.style.padding = '2rem';
 											clonedContent.style.background = '#0f1423';
-											clonedContent.style.margin = '0';
+											clonedContent.style.margin = '0 auto';
+											clonedContent.style.marginLeft = 'auto';
+											clonedContent.style.marginRight = 'auto';
+											clonedContent.style.textAlign = 'left';
+											clonedContent.style.display = 'block';
 											
 											// 모든 이미지가 로드되었는지 확인
 											const imgs = clonedContent.querySelectorAll('img');
@@ -393,9 +646,20 @@ if (resumeEntry) {
 												img.style.display = 'block';
 											});
 											
-											// 모든 텍스트 스타일 보정
+											// 모든 텍스트 요소의 text-align을 left로 설정
+											const textElements = clonedContent.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, ul, ol, blockquote, div, span, a, strong, em');
+											textElements.forEach(el => {
+												el.style.textAlign = 'left';
+												el.style.transform = 'none';
+												el.style.transition = 'none';
+											});
+											
+											// 모든 요소의 transform과 transition 제거
 											const allElements = clonedContent.querySelectorAll('*');
 											allElements.forEach(el => {
+												if (!el.style.textAlign) {
+													el.style.textAlign = 'left';
+												}
 												el.style.transform = 'none';
 												el.style.transition = 'none';
 											});

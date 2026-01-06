@@ -7,13 +7,13 @@ import { Image } from 'astro:assets';
 import profileImage from '../../assets/resume/이력서사진.jpg';
 
 # 김대성 이력서
-신뢰할 수 있는 시스템과 안정적인 서비스를 만드는 백엔드 개발자 김대성입니다.
+안정성을 고려한 코드로 사용자 경험과 서비스 신뢰성을 최우선으로 하는 프로그램을 개발하고 싶습니다.
 
 ## 🙋‍♂️ Profile
 ---
 <div class="profile-container">
   <div class="profile-image">
-    <Image src={profileImage} alt="이력서사진" width={250} />
+    <Image src={profileImage} alt="이력서사진" width={300} />
   </div>
   <div class="profile-info">
     <p><strong>✏️ 이름</strong></p>
@@ -33,75 +33,189 @@ import profileImage from '../../assets/resume/이력서사진.jpg';
   </div>
 </div>
 
-## 😎 About me
-
----
-
-- 안정성과 일관성을 갖춘 코드로 사용자 경험과 서비스 신뢰성을 최우선으로 하는 프로그램을 개발하고 싶습니다.
-
 ## 🎒 Activities
-
 ---
-
-SSAFY 13기
-2025.01.07. ~ 2025.12.31.
-
-인천대학교 PINCOM
-
-2018.04. ~ 2021.11.
-
-- 1620시간
-
-- 교내 프로그래밍 학술 동아리 회장
+<div class="activities-container">
+  <div class="activity-item">
+    <div class="activity-left">
+      <p><strong>SSAFY 13기</strong></p>
+    </div>
+    <div class="activity-right">
+      <ul>
+        <li>2025.01.07. ~ 2025.12.31.</li>
+        <li>1620시간</li>
+      </ul>
+    </div>
+  </div>
+  <div class="activity-item">
+    <div class="activity-left">
+      <p><strong>인천대학교 PINCOM</strong></p>
+    </div>
+    <div class="activity-right">
+      <ul>
+        <li>2018.04. ~ 2021.11.</li>
+        <li>교내 프로그래밍 학술 동아리 회장</li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 [⛏️ Skills and Tools](https://www.notion.so/e8e0f5da92914a889b82f41de5070ce4?pvs=21)
 
-[🏆 Awards](https://www.notion.so/cdc6c50da1b8478fa8fc260b908ce363?pvs=21)
-
 [📝 Projects](https://www.notion.so/46eab7ee25084a1b8ebf190e0e32ec4e?pvs=21)
+
+## 🏆 Awards
+---
+<div class="awards-container">
+  <div class="awards-item">
+    <div class="awards-left">
+      <p><strong>삼성청년SW아카데미 1학기 프로젝트</strong></p>
+    </div>
+    <div class="awards-right">
+      <ul>
+        <li>2025.05.30.</li>
+        <li>최우수상 / 삼성전자주식회사</li>
+        <li><a href="/resume/certificates/삼성청년SW아카데미_1학기_프로젝트.pdf" download>증명서</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="awards-item">
+    <div class="awards-left">
+      <p><strong>컴퓨터공학부 졸업작품 발표회</strong></p>
+    </div>
+    <div class="awards-right">
+      <ul>
+        <li>2021. 05. 12.</li>
+        <li>장려상 / 인천대학교</li>
+        <li><a href="/resume/certificates/졸업작품_장려상.pdf" download>증명서</a></li>
+      </ul>
+    </div>
+  </div>
+    <div class="awards-item">
+    <div class="awards-left">
+      <p><strong>2020 INU 코드 페스티벌</strong></p>
+    </div>
+    <div class="awards-right">
+      <ul>
+        <li>2020. 12. 19.</li>
+        <li>은상 / 인천대학교</li>
+        <li><a href="/resume/certificates/2020_코드_페스티벌_은상.pdf" download>증명서</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 ## 🏅 Certifications
 
 ---
-
-- 정보처리기사(2025.09.12.) / 한국산업인력공단
-
-- 자격증번호 : 25202300612J
-
-- PCCP(2025.06.29.)
-
-- 취득점수 : LV.2
-- 인증서 번호 : 250601010BUF1Y
-
-- SQLD(2025.06.27.) / 한국데이터산업진흥원
-
-- 자격번호 : SQLD-057008768
-
-- OPIc(2025.03.14.) / 한국ACTFL위원회
-
-- 취득점수 :  IM1
-- 등록번호 : 2A2875502522
+<div class="certifications-container">
+  <div class="certification-item">
+    <div class="certification-left">
+      <p><strong>정보처리기사</strong></p>
+    </div>
+    <div class="certification-right">
+      <ul>
+        <li>2025.09.12. / 한국산업인력공단</li>
+        <li>자격증번호 : 25202300612J</li>
+      </ul>
+    </div>
+  </div>
+  <div class="certification-item">
+    <div class="certification-left">
+      <p><strong>PCCP</strong></p>
+    </div>
+    <div class="certification-right">
+      <ul>
+        <li>2025.06.29.</li>
+        <li>취득점수 : LV.2</li>
+        <li>인증서번호 : 250601010BUF1Y</li>
+      </ul>
+    </div>
+  </div>
+  <div class="certification-item">
+    <div class="certification-left">
+      <p><strong>SQLD</strong></p>
+    </div>
+    <div class="certification-right">
+      <ul>
+        <li>2025.06.27. / 한국데이터산업진흥원</li>
+        <li>자격번호 : SQLD-057008768</li>
+      </ul>
+    </div>
+  </div>
+  <div class="certification-item">
+    <div class="certification-left">
+      <p><strong>OPIc</strong></p>
+    </div>
+    <div class="certification-right">
+      <ul>
+        <li>2025.03.14. / 한국ACTFL위원회</li>
+        <li>취득점수 : IM1</li>
+        <li>등록번호 : 2A2875502522</li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 ## 📖 Educations
 
 ---
-
-- 인천대학교 컴퓨터공학부 졸업
-
-- 2018.03. ~ 2022.02.
-- 학점 3.91 / 4.5
-
-- 계양고등학교 졸업
-
-- 2015.03. ~ 2018.02.
+<div class="educations-container">
+  <div class="education-item">
+    <div class="education-left">
+      <p><strong>인천대학교 컴퓨터공학부 졸업</strong></p>
+    </div>
+    <div class="education-right">
+      <ul>
+        <li>2018.03. ~ 2022.02.</li>
+        <li>학점 3.91 / 4.5</li>
+      </ul>
+    </div>
+  </div>
+  <div class="education-item">
+    <div class="education-left">
+      <p><strong>계양고등학교 졸업</strong></p>
+    </div>
+    <div class="education-right">
+      <ul>
+        <li>2015.03. ~ 2018.02.</li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 ## 🎸 ETC
 
 ---
-
-- 육군 중위 복무
-
-- 2022.03. ~ 2024.06.
-- 특기 : 피아노 연주
-- 취미 : 러닝, 야구 관람
-
+<div class="etc-container">
+  <div class="etc-item">
+    <div class="etc-left">
+      <p><strong>육군 중위 복무</strong></p>
+    </div>
+    <div class="etc-right">
+      <ul>
+        <li>2022.03. ~ 2024.06.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="etc-item">
+    <div class="etc-left">
+      <p><strong>취미</strong></p>
+    </div>
+    <div class="etc-right">
+      <ul>
+        <li>러닝, 야구 관람</li>
+      </ul>
+    </div>
+  </div>
+  <div class="etc-item">
+    <div class="etc-left">
+      <p><strong>특기</strong></p>
+    </div>
+    <div class="etc-right">
+      <ul>
+        <li>피아노 연주</li>
+      </ul>
+    </div>
+  </div>
+</div>

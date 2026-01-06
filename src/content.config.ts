@@ -28,4 +28,19 @@ const resume = defineCollection({
 		}),
 });
 
-export const collections = { blog, resume };
+const project = defineCollection({
+	// Load Markdown and MDX files in the `src/content/project/` directory.
+	loader: glob({ base: './src/content/project', pattern: '**/*.{md,mdx}' }),
+	// Type-check frontmatter using a schema
+	schema: ({ image }) =>
+		z.object({
+			title: z.string(),
+			description: z.string(),
+			pubDate: z.coerce.date(),
+			updatedDate: z.coerce.date().optional(),
+			heroImage: image().optional(),
+			tags: z.array(z.string()).optional(),
+		}),
+});
+
+export const collections = { blog, resume, project };

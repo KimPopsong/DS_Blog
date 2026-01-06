@@ -1,0 +1,45 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={`Project | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 4rem 2em;
+			}
+			.project-content {
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 20px;
+				padding: 3rem;
+				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
+			}
+			@media (max-width: 720px) {
+				main {
+					padding: 2rem 1rem;
+				}
+				.project-content {
+					padding: 2rem 1.5rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="project-content">
+				<h1>Project</h1>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
+

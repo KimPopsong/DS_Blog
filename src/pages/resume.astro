@@ -1,0 +1,51 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={`Resume | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 4rem 2rem;
+			}
+			.resume-content {
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 20px;
+				padding: 3rem;
+				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
+			}
+			.resume-content p {
+				font-size: 1.2rem;
+				color: rgb(var(--gray-dark));
+				line-height: 1.8;
+				margin: 0;
+			}
+			@media (max-width: 720px) {
+				main {
+					padding: 2rem 1rem;
+				}
+				.resume-content {
+					padding: 2rem 1.5rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="resume-content">
+				<p>안녕하세요</p>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
+

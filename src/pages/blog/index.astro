@@ -54,6 +54,9 @@ const postsWithContent = await Promise.all(
 const featuredPost = postsWithContent[0];
 const otherPosts = postsWithContent.slice(1); // 나머지 모든 포스트
 
+// 페이징 설정
+const POSTS_PER_PAGE = 10;
+
 // 검색용 데이터 준비 (제목, 설명, 태그, 내용)
 const searchData = postsWithContent.map((post) => ({
 	id: post.id,
@@ -64,6 +67,9 @@ const searchData = postsWithContent.map((post) => ({
 	heroImage: post.data.heroImage?.src || null,
 	pubDate: post.data.pubDate.toISOString(),
 }));
+
+const totalPages = Math.ceil(otherPosts.length / POSTS_PER_PAGE);
+
 ---
 
 <!doctype html>
@@ -103,16 +109,75 @@ const searchData = postsWithContent.map((post) => ({
 				padding: 0;
 			}
 			.post-item {
-				opacity: 0;
-				transform: translateY(20px);
-				transition: opacity 0.6s ease, transform 0.6s ease;
-			}
-			.post-item.visible {
 				opacity: 1;
 				transform: translateY(0);
+				transition: opacity 0.3s ease, transform 0.3s ease;
 			}
 			.post-item.hidden {
 				display: none;
+			}
+			.search-section {
+				grid-column: 1 / -1;
+				margin: 2rem 0;
+			}
+			.search-form {
+				display: flex;
+				gap: 1rem;
+				align-items: center;
+				justify-content: center;
+				flex-wrap: wrap;
+			}
+			.search-select {
+				padding: 0.75rem 1rem;
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 8px;
+				color: rgb(var(--black));
+				font-size: 0.95rem;
+				cursor: pointer;
+				transition: all 0.3s ease;
+			}
+			.search-select:focus {
+				outline: none;
+				border-color: var(--accent);
+				box-shadow: var(--neon-glow);
+			}
+			.search-input {
+				padding: 0.75rem 1rem;
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 8px;
+				color: rgb(var(--black));
+				font-size: 0.95rem;
+				width: 300px;
+				transition: all 0.3s ease;
+			}
+			.search-input:focus {
+				outline: none;
+				border-color: var(--accent);
+				box-shadow: var(--neon-glow);
+			}
+			.search-input::placeholder {
+				color: rgb(var(--gray));
+			}
+			.search-button {
+				padding: 0.75rem 2rem;
+				background: var(--accent);
+				border: 1px solid var(--accent);
+				border-radius: 8px;
+				color: rgb(var(--black));
+				font-size: 0.95rem;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.3s ease;
+			}
+			.search-button:hover {
+				background: var(--accent-glow);
+				box-shadow: var(--neon-glow);
+				transform: translateY(-2px);
+			}
+			.search-button:active {
+				transform: translateY(0);
 			}
 			.no-results {
 				grid-column: 1 / -1;
@@ -125,15 +190,54 @@ const searchData = postsWithContent.map((post) => ({
 				margin-bottom: 0.5rem;
 				color: rgb(var(--black));
 			}
-			.loading-indicator {
+			.pagination {
 				grid-column: 1 / -1;
-				text-align: center;
-				padding: 2rem;
-				color: rgb(var(--gray));
-				display: none;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 0.5rem;
+				margin-top: 3rem;
+				flex-wrap: wrap;
 			}
-			.loading-indicator.active {
-				display: block;
+			@media (max-width: 720px) {
+				.search-form {
+					flex-direction: column;
+					gap: 0.75rem;
+				}
+				.search-select,
+				.search-input {
+					width: 100%;
+				}
+				.search-button {
+					width: 100%;
+				}
+			}
+			.pagination-button {
+				padding: 0.75rem 1.25rem;
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 8px;
+				color: rgb(var(--gray-dark));
+				text-decoration: none;
+				transition: all 0.3s ease;
+				font-size: 0.95rem;
+				cursor: pointer;
+			}
+			.pagination-button:hover:not(.disabled):not(.active) {
+				border-color: var(--accent);
+				color: var(--accent);
+				background: rgba(79, 140, 255, 0.1);
+			}
+			.pagination-button.active {
+				background: var(--accent);
+				border-color: var(--accent);
+				color: rgb(var(--black));
+				box-shadow: var(--neon-glow);
+			}
+			.pagination-button.disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+				pointer-events: none;
 			}
 			.post-card {
 				display: flex;
@@ -337,203 +441,347 @@ const searchData = postsWithContent.map((post) => ({
 					</li>
 				)}
 				{otherPosts.length > 0 && (
-					<ul class="posts-list" id="posts-list">
-						{
-							otherPosts.map((post, index) => (
-								<li class="post-item" data-index={index} data-post-id={post.id}>
-									<a href={`/blog/${post.id}/`} class="post-card">
-										{post.data.heroImage && (
-											<div class="post-image-wrapper">
-												<Image
-													width={720}
-													height={360}
-													src={post.data.heroImage}
-													alt=""
-													class="post-image"
-												/>
-											</div>
-										)}
-										<div class="post-content">
-											<h2 class="post-title">{post.data.title}</h2>
-											<p class="post-date">
-												<FormattedDate date={post.data.pubDate} />
-											</p>
-											{post.data.tags && post.data.tags.length > 0 && (
-												<div class="post-tags">
-													{post.data.tags.slice(0, 3).map((tag) => (
-														<span class="post-tag">{tag}</span>
-													))}
+					<>
+						<ul class="posts-list" id="posts-list">
+							{
+								otherPosts.map((post, index) => (
+									<li class="post-item" data-index={index} data-post-id={post.id}>
+										<a href={`/blog/${post.id}/`} class="post-card">
+											{post.data.heroImage && (
+												<div class="post-image-wrapper">
+													<Image
+														width={720}
+														height={360}
+														src={post.data.heroImage}
+														alt=""
+														class="post-image"
+													/>
 												</div>
 											)}
-										</div>
-									</a>
-								</li>
-							))
-						}
-						<li class="loading-indicator" id="loading-indicator">
-							로딩 중...
-						</li>
-						<li class="no-results" id="no-results" style="display: none;">
-							<h3>검색 결과가 없습니다</h3>
-							<p>다른 키워드로 검색해보세요.</p>
-						</li>
-					</ul>
+											<div class="post-content">
+												<h2 class="post-title">{post.data.title}</h2>
+												<p class="post-date">
+													<FormattedDate date={post.data.pubDate} />
+												</p>
+												{post.data.tags && post.data.tags.length > 0 && (
+													<div class="post-tags">
+														{post.data.tags.slice(0, 3).map((tag) => (
+															<span class="post-tag">{tag}</span>
+														))}
+													</div>
+												)}
+											</div>
+										</a>
+									</li>
+								))
+							}
+							<li class="no-results" id="no-results" style="display: none;">
+								<h3>검색 결과가 없습니다</h3>
+								<p>다른 키워드로 검색해보세요.</p>
+							</li>
+						</ul>
+						<div class="search-section">
+							<form class="search-form" id="search-form">
+								<select class="search-select" id="search-type" aria-label="검색 유형">
+									<option value="all">전체</option>
+									<option value="title">제목</option>
+									<option value="content">내용</option>
+									<option value="tags">태그</option>
+								</select>
+								<input
+									type="text"
+									class="search-input"
+									id="search-input"
+									placeholder="검색어를 입력하세요..."
+									aria-label="검색어 입력"
+								/>
+								<button type="submit" class="search-button">검색</button>
+							</form>
+						</div>
+						{totalPages > 1 && (
+							<div class="pagination" id="pagination">
+								<button class="pagination-button" id="prev-button" data-page="1">이전</button>
+								{
+									Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+										<button class="pagination-button" data-page={pageNum}>
+											{pageNum}
+										</button>
+									))
+								}
+								<button class="pagination-button" id="next-button" data-page="2">다음</button>
+							</div>
+						)}
+					</>
 				)}
 			</ul>
 		</main>
 		<Footer />
-		<script define:vars={{ searchData }}>
+		<script define:vars={{ searchData, postsPerPage: POSTS_PER_PAGE, totalPages, otherPostsCount: otherPosts.length }}>
 			(function() {
 				const postsList = document.getElementById('posts-list');
-				const loadingIndicator = document.getElementById('loading-indicator');
-				const noResults = document.getElementById('no-results');
+				const pagination = document.getElementById('pagination');
+				const searchForm = document.getElementById('search-form');
 				const searchInput = document.getElementById('search-input');
+				const searchType = document.getElementById('search-type');
 				let postItems = Array.from(document.querySelectorAll('.post-item'));
-				let featuredCard = document.querySelector('.featured-card')?.closest('li');
 				
 				if (!postsList || postItems.length === 0) return;
 				
-				let visibleCount = 4; // 초기에 4개만 보이게 (2줄)
-				let isLoading = false;
-				let isSearchMode = false;
+				let filteredPosts = postItems; // 필터링된 포스트 목록
+				let currentSearchQuery = '';
+				let currentSearchType = 'all';
+				
+				// URL에서 페이지 번호와 검색 쿼리 가져오기
+				const urlParams = new URLSearchParams(window.location.search);
+				let currentPage = parseInt(urlParams.get('page')) || 1;
+				const urlSearchQuery = urlParams.get('q') || '';
+				const urlSearchType = urlParams.get('type') || 'all';
+				
+				if (urlSearchQuery) {
+					searchInput.value = urlSearchQuery;
+					searchType.value = urlSearchType;
+					currentSearchQuery = urlSearchQuery;
+					currentSearchType = urlSearchType;
+				}
+				
+				if (currentPage < 1) currentPage = 1;
 				
 				// 검색 함수
-				function searchPosts(query) {
-					if (!query || query.trim() === '') {
-						isSearchMode = false;
-						// 검색 모드 해제 - 모든 포스트 표시
-						postItems.forEach((item, index) => {
-							item.classList.remove('hidden');
-							if (index < visibleCount) {
-								item.classList.add('visible');
-							} else {
-								item.classList.remove('visible');
+				function performSearch(query, type) {
+					currentSearchQuery = query.toLowerCase().trim();
+					currentSearchType = type;
+					const noResults = document.getElementById('no-results');
+					
+					if (!currentSearchQuery) {
+						// 검색어가 없으면 모든 포스트 표시
+						filteredPosts = postItems;
+						if (noResults) noResults.style.display = 'none';
+					} else {
+						// 검색 실행
+						filteredPosts = postItems.filter((item) => {
+							const postId = item.getAttribute('data-post-id');
+							const post = searchData.find(p => p.id === postId);
+							if (!post) return false;
+							
+							const searchTerm = currentSearchQuery;
+							
+							if (type === 'title') {
+								return post.title.toLowerCase().includes(searchTerm);
+							} else if (type === 'content') {
+								return post.content.toLowerCase().includes(searchTerm);
+							} else if (type === 'tags') {
+								return post.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+							} else { // all
+								return (
+									post.title.toLowerCase().includes(searchTerm) ||
+									post.description.toLowerCase().includes(searchTerm) ||
+									post.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+									post.content.toLowerCase().includes(searchTerm)
+								);
 							}
 						});
-						if (featuredCard) featuredCard.style.display = '';
-						noResults.style.display = 'none';
-						loadingIndicator.style.display = visibleCount < postItems.length ? 'block' : 'none';
-						return;
-					}
-					
-					isSearchMode = true;
-					const searchTerm = query.toLowerCase().trim();
-					
-					// 검색 실행
-					const matchingPostIds = searchData
-						.filter((post) => {
-							const titleMatch = post.title.toLowerCase().includes(searchTerm);
-							const descriptionMatch = post.description.toLowerCase().includes(searchTerm);
-							const tagsMatch = post.tags.some(tag => tag.toLowerCase().includes(searchTerm));
-							const contentMatch = post.content.toLowerCase().includes(searchTerm);
-							return titleMatch || descriptionMatch || tagsMatch || contentMatch;
-						})
-						.map(post => post.id);
-					
-					// Featured 카드 숨기기
-					if (featuredCard) featuredCard.style.display = 'none';
-					
-					// 검색 결과 표시
-					let visibleInSearch = 0;
-					postItems.forEach((item) => {
-						const postId = item.getAttribute('data-post-id');
-						if (matchingPostIds.includes(postId)) {
-							item.classList.remove('hidden');
-							item.classList.add('visible');
-							visibleInSearch++;
-						} else {
-							item.classList.add('hidden');
-							item.classList.remove('visible');
-						}
-					});
-					
-					// 검색 결과 없음 메시지
-					if (visibleInSearch === 0) {
-						noResults.style.display = 'block';
-						loadingIndicator.style.display = 'none';
-					} else {
-						noResults.style.display = 'none';
-						loadingIndicator.style.display = 'none';
-					}
-				}
-				
-				// 검색 입력 이벤트
-				if (searchInput) {
-					let searchTimeout;
-					searchInput.addEventListener('input', (e) => {
-						clearTimeout(searchTimeout);
-						searchTimeout = setTimeout(() => {
-							searchPosts(e.target.value);
-						}, 300); // 디바운스 300ms
-					});
-				}
-				
-				// 초기 포스트 표시
-				function showInitialPosts() {
-					postItems.forEach((item, index) => {
-						if (index < visibleCount) {
-							setTimeout(() => {
-								item.classList.add('visible');
-							}, index * 100);
-						}
-					});
-				}
-				
-				// 추가 포스트 로드
-				function loadMorePosts() {
-					if (isSearchMode || isLoading || visibleCount >= postItems.length) {
-						if (visibleCount >= postItems.length) {
-							loadingIndicator?.classList.remove('active');
-						}
-						return;
-					}
-					
-					isLoading = true;
-					loadingIndicator?.classList.add('active');
-					
-					// 다음 2개 포스트 표시 (한 줄에 2개)
-					const nextCount = Math.min(visibleCount + 2, postItems.length);
-					
-					setTimeout(() => {
-						for (let i = visibleCount; i < nextCount; i++) {
-							if (postItems[i]) {
-								setTimeout(() => {
-									postItems[i].classList.add('visible');
-								}, (i - visibleCount) * 100);
+						
+						// 검색 결과 없음 메시지
+						if (noResults) {
+							if (filteredPosts.length === 0) {
+								noResults.style.display = 'block';
+							} else {
+								noResults.style.display = 'none';
 							}
 						}
-						
-						visibleCount = nextCount;
-						isLoading = false;
-						
-						if (visibleCount >= postItems.length) {
-							loadingIndicator?.classList.remove('active');
-						}
-					}, 300);
+					}
+					
+					// 검색 결과에 따라 페이지 리셋
+					currentPage = 1;
+					const filteredPages = Math.ceil(filteredPosts.length / postsPerPage);
+					updatePagination();
+					// DOM 업데이트 완료 후 페이지 표시 및 버튼 스타일 적용
+					setTimeout(() => {
+						showPage(1, filteredPages);
+					}, 0);
 				}
 				
-				// Intersection Observer로 스크롤 감지
-				const observerOptions = {
-					root: null,
-					rootMargin: '200px',
-					threshold: 0.1
-				};
+				// 페이지네이션 업데이트 (필터링된 결과에 따라)
+				function updatePagination() {
+					const filteredPages = Math.ceil(filteredPosts.length / postsPerPage);
+					const paginationElement = document.getElementById('pagination');
+					
+					if (!paginationElement) return;
+					
+					// 기존 이벤트 리스너 제거를 위해 새 요소로 교체
+					const newPaginationContainer = document.createElement('div');
+					newPaginationContainer.className = 'pagination';
+					newPaginationContainer.id = 'pagination';
+					
+					if (filteredPages > 1) {
+						// 이전 버튼
+						const prevButton = document.createElement('button');
+						prevButton.className = 'pagination-button';
+						prevButton.id = 'prev-button';
+						prevButton.textContent = '이전';
+						prevButton.dataset.page = '1';
+						newPaginationContainer.appendChild(prevButton);
+						
+						// 페이지 번호 버튼들
+						for (let i = 1; i <= filteredPages; i++) {
+							const pageButton = document.createElement('button');
+							pageButton.className = 'pagination-button';
+							pageButton.textContent = i;
+							pageButton.dataset.page = i;
+							newPaginationContainer.appendChild(pageButton);
+						}
+						
+						// 다음 버튼
+						const nextButton = document.createElement('button');
+						nextButton.className = 'pagination-button';
+						nextButton.id = 'next-button';
+						nextButton.textContent = '다음';
+						nextButton.dataset.page = '2';
+						newPaginationContainer.appendChild(nextButton);
+						
+						// 이벤트 리스너 등록
+						newPaginationContainer.addEventListener('click', handlePaginationClick);
+					}
+					
+					// 기존 요소 교체
+					paginationElement.parentNode.replaceChild(newPaginationContainer, paginationElement);
+					
+					// DOM 교체 후 즉시 스타일 적용을 위해 다음 프레임에서 처리
+					return filteredPages;
+				}
 				
-				const observer = new IntersectionObserver((entries) => {
-					entries.forEach(entry => {
-						if (entry.isIntersecting) {
-							loadMorePosts();
+				// 페이지네이션 표시 함수
+				function showPage(page, totalPagesCount) {
+					if (!totalPagesCount) {
+						totalPagesCount = Math.ceil(filteredPosts.length / postsPerPage);
+					}
+					
+					if (page < 1) page = 1;
+					if (page > totalPagesCount) page = totalPagesCount;
+					
+					currentPage = page;
+					
+					const startIndex = (page - 1) * postsPerPage;
+					const endIndex = startIndex + postsPerPage;
+					
+					// 모든 포스트 숨기기
+					postItems.forEach(item => {
+						item.classList.add('hidden');
+					});
+					
+					// 필터링된 포스트 중 현재 페이지 항목만 표시
+					filteredPosts.forEach((item, index) => {
+						if (index >= startIndex && index < endIndex) {
+							item.classList.remove('hidden');
 						}
 					});
-				}, observerOptions);
+					
+					// 페이지네이션 버튼 업데이트 (직접 호출)
+					updatePaginationButtons(page, totalPagesCount);
+					
+					// URL 업데이트
+					const params = new URLSearchParams();
+					if (page > 1) params.set('page', page);
+					if (currentSearchQuery) {
+						params.set('q', currentSearchQuery);
+						if (currentSearchType !== 'all') {
+							params.set('type', currentSearchType);
+						}
+					}
+					const queryString = params.toString();
+					const newUrl = queryString 
+						? `${window.location.pathname}?${queryString}` 
+						: window.location.pathname;
+					window.history.replaceState({}, '', newUrl);
+				}
 				
-				// 초기 포스트 표시
-				showInitialPosts();
+				// 페이지네이션 버튼 업데이트
+				function updatePaginationButtons(page, totalPagesCount) {
+					const paginationElement = document.getElementById('pagination');
+					if (!paginationElement) {
+						// DOM이 아직 준비되지 않았으면 잠시 후 다시 시도
+						setTimeout(() => updatePaginationButtons(page, totalPagesCount), 10);
+						return;
+					}
+					
+					const prevButton = document.getElementById('prev-button');
+					const nextButton = document.getElementById('next-button');
+					
+					// 버튼이 없으면 반환 (필터링된 페이지가 1개 이하일 때)
+					if (!prevButton || !nextButton) return;
+					
+					// 모든 숫자 버튼에서 active 제거 (이전/다음 버튼 제외)
+					const numberButtons = paginationElement.querySelectorAll('.pagination-button:not(#prev-button):not(#next-button)');
+					numberButtons.forEach(btn => {
+						btn.classList.remove('active');
+					});
+					
+					// 현재 페이지 버튼 활성화 (숫자 버튼만)
+					numberButtons.forEach(btn => {
+						const btnPage = parseInt(btn.dataset.page);
+						if (btnPage === page) {
+							btn.classList.add('active');
+						}
+					});
+					
+					// 이전/다음 버튼 상태 업데이트
+					prevButton.classList.remove('active', 'disabled');
+					if (page === 1) {
+						prevButton.classList.add('disabled');
+					} else {
+						prevButton.dataset.page = page - 1;
+					}
+					
+					nextButton.classList.remove('active', 'disabled');
+					if (page >= totalPagesCount) {
+						nextButton.classList.add('disabled');
+					} else {
+						nextButton.dataset.page = page + 1;
+					}
+				}
 				
-				// 로딩 인디케이터 관찰 시작
-				if (visibleCount < postItems.length) {
-					loadingIndicator?.classList.add('active');
-					observer.observe(loadingIndicator);
+				// 페이지네이션 버튼 클릭 핸들러
+				function handlePaginationClick(e) {
+					e.stopPropagation();
+					const button = e.target.closest('.pagination-button');
+					if (!button || button.classList.contains('disabled')) return;
+					
+					const page = parseInt(button.dataset.page);
+					const filteredPages = Math.ceil(filteredPosts.length / postsPerPage);
+					if (page && page >= 1 && page <= filteredPages) {
+						showPage(page, filteredPages);
+						// 페이지 상단으로 스크롤
+						window.scrollTo({ top: 0, behavior: 'smooth' });
+					}
+				}
+				
+				// 검색 폼 이벤트
+				if (searchForm) {
+					searchForm.addEventListener('submit', (e) => {
+						e.preventDefault();
+						const query = searchInput.value.trim();
+						const type = searchType.value;
+						performSearch(query, type);
+						window.scrollTo({ top: 0, behavior: 'smooth' });
+					});
+				}
+				
+				// 초기화
+				if (urlSearchQuery) {
+					performSearch(urlSearchQuery, urlSearchType);
+				} else {
+					// 검색어가 없으면 모든 포스트 사용
+					filteredPosts = postItems;
+					const filteredPages = Math.ceil(filteredPosts.length / postsPerPage);
+					
+					// 페이징 업데이트 및 초기 버튼 활성화
+					const initialPagination = document.getElementById('pagination');
+					if (initialPagination && filteredPages > 1) {
+						initialPagination.addEventListener('click', handlePaginationClick);
+						updatePaginationButtons(currentPage, filteredPages);
+					}
+					
+					showPage(currentPage, filteredPages);
 				}
 			})();
 		</script>

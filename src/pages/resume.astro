@@ -11,15 +11,15 @@ const resumeEntry = resumeEntries[0]; // 첫 번째 resume 파일 사용
 
 // 프로젝트 컬렉션 가져오기
 const allProjects = await getCollection('project');
-// 지정된 순서대로 정렬: PICA, 골든티켓, TODO, 머지?, 책 찾는 여우
-const projectOrder = ['PICA', 'GOLDEN_TICKET', 'TODO', 'MERGE', 'FOX_BOOK_FINDER'];
+const projectOrder = ['PICA', 'GOLDEN_TICKET', 'TODO', 'MERGE'];
 const sortedProjects = projectOrder
 	.map(id => allProjects.find(p => p.id === id || p.id.toLowerCase() === id.toLowerCase()))
 	.filter(Boolean)
 	.concat(allProjects.filter(p => !projectOrder.some(orderId => p.id === orderId || p.id.toLowerCase() === orderId.toLowerCase())));
 
-// 프로젝트 데이터 준비 (이미지 URL 포함)
+// 프로젝트 데이터 준비 (이미지 URL 포함) - FOX_BOOK_FINDER 제외
 	const projectsData = sortedProjects
+		.filter(project => project.id !== 'FOX_BOOK_FINDER' && project.id.toLowerCase() !== 'fox_book_finder')
 		.filter((project): project is NonNullable<typeof project> => project !== undefined)
 		.map((project) => {
 			let imageUrl = '';

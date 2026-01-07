@@ -10,37 +10,53 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 	<head>
 		<BaseHead title={`Home | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
+			html, body {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+			body {
+				margin: 0;
+			}
 			main {
 				max-width: 1400px;
 				width: 100%;
 				margin: 0 auto;
 				padding: 4em 2em;
+				flex: 1;
 			}
 			.hero-section {
 				text-align: center;
 				margin-bottom: 6rem;
 			}
 			.hero-title {
-				font-size: 5rem;
+				font-size: 3rem;
 				font-weight: 700;
 				margin: 0 0 1.5rem 0;
 				line-height: 1.1;
-				background: linear-gradient(135deg, rgb(var(--black)) 0%, var(--accent) 50%, var(--accent-glow) 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
-				animation: gradient-shift 3s ease infinite;
-				background-size: 200% 200%;
+				color: rgb(var(--black));
+				font-family: 'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR','Segoe UI','Roboto','Helvetica Neue',Arial,sans-serif;
+				white-space: nowrap;
 			}
-			@keyframes gradient-shift {
-				0%, 100% { background-position: 0% 50%; }
-				50% { background-position: 100% 50%; }
+			.typing-text {}
+			.cursor-blink {
+				animation: blink 1s step-end infinite;
+				color: var(--accent);
+			}
+			@keyframes blink {
+				0%, 100% { opacity: 1; }
+				50% { opacity: 0; }
 			}
 			.hero-subtitle {
 				font-size: 1.5rem;
 				color: rgb(var(--gray-dark));
 				margin-bottom: 3rem;
 				line-height: 1.6;
+			}
+			.tech-stack {
+				color: var(--accent);
+				font-weight: 600;
+				font-size: 1.2rem;
 			}
 			.cta-button {
 				display: inline-block;
@@ -98,7 +114,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 					padding: 3em 1.5em;
 				}
 				.hero-title {
-					font-size: 4rem;
+					font-size: 2.5rem;
 				}
 			}
 			@media (max-width: 720px) {
@@ -109,7 +125,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 					margin-bottom: 4rem;
 				}
 				.hero-title {
-					font-size: 2.5rem;
+					font-size: 1.8rem;
 					margin-bottom: 1rem;
 				}
 				.hero-subtitle {
@@ -142,7 +158,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 					padding: 1.5em 0.75em;
 				}
 				.hero-title {
-					font-size: 2rem;
+					font-size: 1.5rem;
 				}
 				.hero-subtitle {
 					font-size: 1rem;
@@ -157,10 +173,9 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<Header />
 		<main>
 			<div class="hero-section">
-				<h1 class="hero-title">안녕하세요 👋</h1>
+				<h1 class="hero-title" id="typing-title"><span class="typing-prefix">&gt; </span><span class="typing-content"></span><span class="cursor-blink">_</span></h1>
 				<p class="hero-subtitle">
-					개발과 학습의 여정을 기록하는 공간입니다.<br />
-					Spring, JPA, 그리고 다양한 프로젝트 경험을 공유합니다.
+					안정성을 고려한 코드로 사용자 경험과 서비스 신뢰성을 최우선으로 합니다.<br />
 				</p>
 				<a href="/blog" class="cta-button">블로그 보기 →</a>
 			</div>
@@ -188,6 +203,30 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				</div>
 			</div>
 		</main>
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				const contentEl = document.querySelector('#typing-title .typing-content');
+				if (!contentEl) return;
+				const fullText = '백엔드 개발자 김대성입니다.';
+				const typingDelayMs = 80;
+				const restartDelayMs = 3000;
+				let index = 0;
+				function typeNext() {
+					if (index <= fullText.length) {
+						contentEl.textContent = fullText.slice(0, index);
+						index += 1;
+						setTimeout(typeNext, typingDelayMs);
+					} else {
+						setTimeout(() => {
+							index = 0;
+							contentEl.textContent = '';
+							typeNext();
+						}, restartDelayMs);
+					}
+				}
+				typeNext();
+			});
+		</script>
 		<Footer />
 	</body>
 </html>

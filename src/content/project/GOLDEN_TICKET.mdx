@@ -118,7 +118,7 @@ import erd from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp';
         - 원인은 Spring Boot가 JVM 기본 Time Zone을 따라가기 때문에, 서버 및 DB 설정만으로는 적용되지 않음을 확인
         - 애플리케이션 실행 시 `@PostConstruct`를 통해 JVM TimeZone을 `Asia/Seoul`로 설정하여 문제 해결
 
-## **[성과 & 배운 점]**
+## **[배운 점]**
 
 - 실제 사용자 피드백에서 직관적이고 사용하기 편리하다는 평가
 - Redis 캐싱 및 Sentinel 적용으로 응답 속도와 가용성 개선
@@ -176,7 +176,6 @@ import erd from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp';
             </div>
         </div>
     </div>
-
 - 선호 팀별 테마 적용
     <div style="display: flex; flex-direction: column; gap: 1.5rem; margin: 2rem 0;">
         <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; max-width: 100%;">
@@ -193,10 +192,8 @@ import erd from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp';
             </div>
         </div>
     </div>
-
-- 입장권 생성  
-    <Image src={ticket} alt="입장권생성" />
-
+- 입장권 생성
+    <br/><Image src={ticket} alt="입장권생성" />
 - 챗봇
     <div style="display: flex; gap: 1.5rem; justify-content: center; align-items: center; flex-wrap: wrap; margin: 2rem 0;">
         <div style="display: flex; align-items: center;">
@@ -207,7 +204,7 @@ import erd from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp';
         </div>
     </div>
 
-## **[아키텍처 구조]**
+## [아키텍처 구조]
 
 <Image src={architecture} alt="아키텍처구조" />
 

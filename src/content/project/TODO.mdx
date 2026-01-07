@@ -8,118 +8,224 @@ thumbnail: '../../assets/projects/TODO/TODO_Hero.webp'
 heroImage: '../../assets/projects/TODO/TODO_Hero.webp'
 gitHub: "https://github.com/KimPopsong/SSAFY-Through-Project"
 teamSize: "3명"
-tags: ["Spring Boot", "MySQL", "JPA", "AWS", "Redis", "Prometheus", "Grafana", "k6"]
+tags: ["Spring Boot", "Vue", "MySQL", "MyBatis", "AWS", "Redis"]
 ---
+# SSAFY Through (Tripalgo)
 
-## **1. 사용 기술**
+관광지를 검색하고 주변의 숙박업소를 쉽게 찾을 수 있는 커뮤니티 플랫폼
 
-### **1.1. Backend**
+## [개요]
 
-- **Java 17**
-- **Spring Boot 3.2.5**
-- **Spring AI:** LLM(Large Language Model)을 활용한 AI 기능 구현
-- **Spring Security:** JWT 기반 인증 및 인가
-- **Spring Data JPA:** 데이터베이스 연동
-- **MySQL 8.0:** 주 데이터베이스
-- **Redis:** 실시간 데이터 처리 및 캐싱 (JWT, 채팅 등)
-- **MyBatis:** 유연한 SQL 쿼리 관리
-- **WebSocket (STOMP):** 실시간 양방향 통신 (채팅)
+- 관광지를 검색하고 주변의 숙박업소를 쉽게 찾을 수 있는 커뮤니티
+- 관광지 주변 숙박업자들이 커뮤니티에 홍보 및 예약을 받을 수 있도록 구현
+- 유저, 셀러, 관리자의 권한 구현
+- AI 기반 관광지 추천 및 검색 기능 제공
 
-### **1.2. Frontend**
+## [사용 기술 스택]
 
-- **Vue.js 3**
-- **Vite**
-- **Pinia:** 상태 관리
-- **Axios:** HTTP 통신
-- **Tailwind CSS:** UI 스타일링
+- Infra
+  - AWS : EC2, S3
+  - Docker
+  - Vite
+  - Nginx, DNS
+  - GitLab CI/CD
+- BE
+  - 개발 환경 : IntelliJ IDEA
+  - 빌드 도구 : Maven
+  - 프레임워크 : Spring Boot (3.4.5)
+  - 언어 : Java (17)
+  - DB : MySQL
+  - 데이터 접근 : MyBatis
+  - 캐싱 : Redis (Redis Cloud)
+  - AI : Spring AI (1.0.0-M6), OpenAI GPT-4o
+  - 실시간 통신 : WebSocket (STOMP)
+  - 인증/보안 : Spring Security, JWT
+  - 모니터링 : Prometheus, Micrometer, Loki
+  - 이메일 : Spring Mail (SMTP)
+  - 기타 : Lombok, JSP/JSTL
+- FE
+  - 개발 환경 : VS Code
+  - 빌드 도구 : Node.js, Vite (6.2.4)
+  - 프레임워크 : Vue (3.5.13)
+  - 언어 : TypeScript
+  - 상태 관리 : Pinia (3.0.1)
+  - 라우팅 : Vue Router (4.5.0)
+  - HTTP 클라이언트 : Axios (1.9.0)
+  - UI 프레임워크 : Tailwind CSS (4.1.5), DaisyUI (5.0.35), Vuetify (3.8.4)
+  - 실시간 통신 : STOMP.js, SockJS
+  - 지도 : vue3-kakao-maps (2.3.10)
+  - 기타 : vue-daum-postcode (주소 검색)
 
-### **1.3. DevOps**
+## [주요 담당 기능]
 
-- **Git, GitHub:** 버전 관리 및 협업
-- **Docker, Docker Compose:** 컨테이너 기반 배포 및 관리
-- **Jenkins:** CI/CD 파이프라인 구축
-- **NGINX:** 리버스 프록시 및 로드 밸런싱
-- **AWS (EC2, S3, RDS):** 클라우드 인프라 활용
+- BE
+  - 인증 및 보안
+    - JWT 기반 인증 시스템 구현
+      - 토큰 발급 및 검증
+      - 10분 유효 기간 설정
+      - Spring Security를 통한 인증/인가 처리
+    - 회원가입 시 이메일 인증 기능
+      - SMTP를 통한 인증 메일 발송
+      - reCAPTCHA 설정
+  - 게시판
+    - 게시글 CRUD 기능
+      - 게시글 작성, 수정, 삭제, 조회
+      - 조회수 증가 기능
+      - 페이징 처리
+    - 댓글 시스템
+      - 댓글 작성, 수정, 삭제
+      - JWT 기반 작성자 인증
+    - 게시판 타입별 분류
+      - BoardType 컬럼을 통한 게시판 구분
+      - 메인 페이지 최근 5개 글 미리보기
+  - 관리자 기능
+    - 회원 관리
+      - 회원 목록 조회 (페이징)
+      - 회원 상세 정보 조회
+      - 검색 기능 (이름, 이메일)
+    - 셀러 요청 관리
+      - 셀러 등록 요청 승인/거절
+      - 대기 중인 요청 수 조회
+- FE
+  - 사용자 인터페이스
+    - 반응형 웹 디자인
+      - Tailwind CSS, DaisyUI, Vuetify를 활용한 모던한 UI
+    - 라우팅 및 네비게이션
+      - Vue Router를 통한 SPA 구현
+      - 인증이 필요한 페이지 보호
+    - 상태 관리
+      - Pinia를 통한 전역 상태 관리
+      - 사용자 정보 및 인증 상태 관리
+  - 관광지 검색
+    - 지도 기반 관광지 검색
+      - Kakao Maps API 연동
+      - 필터 검색 (시/도, 시/군/구, 타입)
+      - 키워드 검색
+      - 결과 내 검색 기능
+  - 게시판
+    - 게시글 목록, 상세, 작성, 수정 화면
+    - 댓글 기능
+    - 추천/비추천 기능
+  - 회원 관리
+    - 회원가입 (이메일 인증)
+    - 로그인 (JWT 토큰 저장)
+    - 마이페이지
+    - 회원 정보 수정
+  - 관리자 기능
+    - 회원 관리 화면
+    - 셀러 요청 관리 화면
+    - 권한 관리
 
-## **2. 세부 구성도**
+## [트러블슈팅 & 문제 해결]
 
-![세부구성도](../../assets/projects/TODO/TODO_Architecture.webp)
+- BE
+  - JWT 검증 문제
+    - 프론트엔드에서 토큰을 전송했으나 백엔드에서 검증 실패
+    - Authorization 헤더에서 "Bearer " 접두사 제거 로직 추가
+    - 토큰 검증 로직 개선
+    - CORS 설정 보완
+  - MyBatis 페이징 처리
+    - 복잡한 검색 조건에서 페이징 처리 어려움
+    - SearchCondition DTO를 통한 검색 조건 관리
+    - Page DTO를 통한 페이징 정보 전달
+    - 동적 쿼리 활용
+- FE
+  - CORS 문제
+    - 프론트엔드에서 백엔드 API 호출 시 CORS 에러 발생
+    - 백엔드 CORS 설정 추가
+    - Axios 인터셉터 설정
+  - 상태 관리 문제
+    - 페이지 새로고침 시 인증 상태 유실
+    - localStorage에 JWT 토큰 저장
+    - Pinia store 초기화 시 토큰 확인
+    - 라우터 가드에서 토큰 검증
 
-## **3. 아키텍처 구조**
+## [성과]
+- JWT 기반 인증 시스템 및 권한 관리 시스템 구축
+- RESTful API 설계 및 프론트엔드-백엔드 분리 아키텍처 구현
 
-TODO 프로젝트는 MSA(Microservice Architecture)를 기반으로 설계되었습니다. 각 서비스는 독립적으로 개발, 배포, 확장이 가능하여 유연하고 안정적인 시스템 운영을 보장합니다.
+## [주요 화면]
+- 관광지 검색
+  - 지도 기반 관광지 검색 화면
+  - 필터 검색 (시/도, 시/군/구, 타입)
+  - 키워드 검색
+  - 결과 내 검색
+- 게시판
+  - 게시글 목록 화면
+  - 게시글 상세 화면
+  - 게시글 작성/수정 화면
+  - 댓글 기능
+- 회원 관리
+  - 로그인 화면
+  - 회원가입 화면
+  - 마이페이지
+  - 회원 목록 (관리자)
+- 채팅
+  - 채팅방 목록
+  - 실시간 채팅 화면
+- 셀러 기능
+  - 상품 등록 화면
+  - 상품 상세 화면
+  - 셀러 상품 목록
+- 관리자 기능
+  - 회원 관리 화면
+  - 셀러 요청 관리 화면
 
-### **3.1. 주요 서비스**
+## [아키텍처 구조]
 
-- **User Service:** 회원 가입, 로그인, 프로필 관리 등 사용자 관련 기능을 담당합니다.
-- **Attraction Service:** 관광지 정보 조회, 검색, 추천 등 여행지 관련 기능을 담당합니다.
-- **Post Service:** 게시판, 댓글, 추천 등 커뮤니티 관련 기능을 담당합니다.
-- **Product Service:** 판매자 상품 등록, 수정, 삭제 등 상품 관련 기능을 담당합니다.
-- **Reservation Service:** 상품 예약 및 결제 관련 기능을 담당합니다.
-- **Chat Service:** 사용자-판매자 간 실시간 채팅 기능을 담당합니다.
-- **Admin Service:** 관리자 기능(회원 관리, 판매자 승인 등)을 담당합니다.
+```
+┌─────────────┐
+│   Frontend  │  Vue 3 + TypeScript + Vite
+│   (Vue.js)  │
+└──────┬──────┘
+       │ HTTP/REST API
+       │ WebSocket (STOMP)
+┌──────▼──────┐
+│   Backend   │  Spring Boot 3.4.5
+│  (Java 17)  │
+└──────┬──────┘
+       │
+   ┌───┴───┐
+   │       │
+┌──▼──┐ ┌──▼──┐
+│MySQL│ │Redis│
+│     │ │     │
+│     │ │Vector│
+│     │ │Store │
+└─────┘ └─────┘
+```
 
-### **3.2. 데이터베이스 설계**
+## [ERD]
 
-각 서비스는 독립적인 데이터베이스를 사용하여 서비스 간 결합도를 낮추고 데이터 관리의 효율성을 높입니다.
+- 주요 테이블
+  - member: 회원 정보
+  - post: 게시글
+  - comment: 댓글
+  - attraction: 관광지 정보
+  - product: 상품 (숙박업소)
+  - seller: 셀러 정보
+  - seller_request: 셀러 등록 요청
+  - reservation: 예약 정보
+  - chat_room: 채팅방
+  - chat_message: 채팅 메시지
+  - address: 주소 정보
+  - sido, gugun: 시/도, 시/군/구 정보
+  - content_type: 관광지 타입
 
-## **4. 구현 내용**
+## [회고]
 
-### **4.1. 인증 및 인가 (Spring Security & JWT)**
+### Best Practice (배운 점)
+- JWT 기반 인증 시스템 구현 및 이해
+- RESTful API 설계 원칙 학습 및 적용
+- 프론트엔드와 백엔드 분리 아키텍처 경험
+- Vue 3 Composition API 활용 경험
+- TypeScript를 통한 타입 안정성 확보 및 개발 생산성 향상
+- 계층형 아키텍처(Controller-Service-DAO)를 통한 코드 구조화
+- DTO 패턴을 통한 데이터 전달 객체 분리
+- MyBatis 동적 쿼리를 활용한 유연한 데이터 조회
+- Redis를 활용한 토큰 관리 및 캐싱
 
-- **`SecurityConfig`:** Spring Security의 핵심 설정 파일입니다. HTTP 요청에 대한 보안 규칙, 필터 체인, 인증 및 인가 처리 방식 등을 정의합니다.
-    - `filterChain()`: HTTP 요청에 대한 보안 필터 체인을 설정합니다. `JWTAuthenticationFilter`를 등록하여 모든 요청에 대해 JWT 토큰을 검증합니다.
-    - `corsConfigurationSource()`: CORS(Cross-Origin Resource Sharing) 설정을 통해 다른 도메인에서의 요청을 허용합니다.
-- **`JWTAuthenticationFilter`:** 클라이언트의 모든 요청을 가로채 헤더에 포함된 JWT 토큰의 유효성을 검증합니다.
-    - 토큰이 유효하면 `SecurityContextHolder`에 인증 정보를 저장하여 해당 요청이 인증된 사용자의 요청임을 명시합니다.
-- **`JWTService`:** JWT 토큰의 생성, 검증, 파싱 등 JWT 관련 모든 로직을 처리합니다.
-    - `generateToken()`: 사용자 정보를 기반으로 JWT 토큰을 생성합니다.
-    - `validateToken()`: 토큰의 유효 기간, 서명 등을 검증합니다.
-    - `getEmailFromToken()`: 토큰에서 사용자 이메일 정보를 추출합니다.
-- **`AuthController`:** 로그인, 회원가입 등 인증 관련 API 엔드포인트를 제공합니다.
-    - `/login`: 사용자로부터 이메일과 비밀번호를 받아 로그인을 처리하고, 성공 시 JWT 토큰을 발급합니다.
-    - `/regist-member`: 회원가입 요청을 처리합니다.
-
-### **4.2. AI 기반 관광지 추천 (Spring AI & VectorStore)**
-
-- **`AttractionDataMigrator`:** 프로젝트 시작 시, 데이터베이스의 관광지 정보를 VectorStore(Redis)에 벡터 형태로 저장하는 역할을 합니다.
-- **`AttractionsController`:** 관광지 관련 API 엔드포인트를 제공합니다.
-    - `/similar`: 특정 관광지와 유사한 관광지를 추천해주는 API입니다.
-- **`AttractionsServiceImpl`:** 관광지 추천 비즈니스 로직을 구현합니다.
-    - `selectSimilarAttractions()`: 사용자가 선택한 관광지의 `overview`(소개) 텍스트를 기반으로 VectorStore에서 유사한 벡터를 가진 관광지들을 검색하여 반환합니다. Spring AI의 `VectorStore` 인터페이스를 통해 간단하게 유사도 검색을 수행할 수 있습니다.
-
-### **4.3. 실시간 채팅 (WebSocket & STOMP & Redis)**
-
-- **`WebSocketConfig`:** WebSocket 및 STOMP 관련 설정을 담당합니다.
-    - `registerStompEndpoints()`: 클라이언트가 WebSocket 연결을 시작할 엔드포인트를 지정합니다. (`/ws`)
-    - `configureMessageBroker()`: 메시지 브로커를 설정합니다.
-        - `/topic`: 1:N 통신(채팅방)을 위한 경로
-        - `/queue`: 1:1 통신을 위한 경로
-        - `/app`: 클라이언트에서 서버로 메시지를 보낼 때 사용하는 경로
-- **`ChatController`:** WebSocket 메시지를 처리하는 컨트롤러입니다.
-    - `@MessageMapping("/chat/{roomId}")`: `/app/chat/{roomId}` 경로로 들어오는 메시지를 처리합니다.
-    - `@SendTo("/topic/chat/{roomId}")`: 메시지 처리 후, 해당 채팅방을 구독하고 있는 모든 클라이언트에게 메시지를 브로드캐스팅합니다.
-- **`ChatServiceImpl`:** 채팅 관련 비즈니스 로직을 구현합니다.
-    - `insertMessage()`: 수신된 채팅 메시지를 데이터베이스(MySQL)에 저장하고, 동시에 Redis에도 저장하여 최근 메시지를 빠르게 조회할 수 있도록 합니다.
-    - `getRecentMessagesFromRedis()`: 채팅방 입장 시, Redis에 캐시된 최근 메시지를 먼저 불러와 사용자에게 빠르게 보여줍니다.
-    - `getMessagesByRoomIdPaged()`: Redis에 없는 과거 메시지는 데이터베이스에서 페이징 처리하여 조회합니다.
-
-### **4.4. 게시판 및 커뮤니티**
-
-- **`PostController`:** 게시글 작성, 조회, 수정, 삭제 및 댓글, 추천 관련 API를 제공합니다.
-    - `GET /list`: 게시판 종류(`boardType`)에 따른 게시글 목록을 조회합니다.
-    - `GET /detail/{id}`: 특정 게시글의 상세 내용을 조회하며, 조회수를 1 증가시킵니다.
-    - `POST /write`: 새로운 게시글을 작성합니다. JWT 토큰에서 작성자 정보를 추출하여 저장합니다.
-    - `PATCH /update/{postId}`: 기존 게시글을 수정합니다.
-    - `DELETE /delete/{id}`: 게시글을 삭제합니다. 작성자 본인이거나 관리자만 삭제할 수 있습니다.
-    - `POST /recommend/{id}`: 게시글을 추천/비추천합니다. 한 번만 참여할 수 있도록 중복을 체크합니다.
-- **`PostServiceImpl`:** 게시판 관련 비즈니스 로직을 구현합니다.
-    - `deletePost()`: 게시글 삭제 요청 시, 요청한 사용자가 작성자 본인인지 또는 관리자인지 권한을 확인한 후 삭제를 진행합니다.
-    - `updateRecommendCount()`: 추천/비추천 요청 시, `recommendation` 테이블을 확인하여 이미 참여했는지 확인하고, 참여하지 않았을 경우에만 추천/비추천 수를 업데이트하고 참여 기록을 남깁니다.
-
-### **4.5. 판매자 및 상품 관리**
-
-- **`ProductController`:** 판매자의 상품 등록, 조회, 삭제 API를 제공합니다.
-- **`ReservationController`:** 사용자의 상품 예약 생성 및 조회 API를 제공합니다.
-- **`SellerRequestController`:** 사용자의 판매자 등록 신청 및 관리자의 승인/거절 API를 제공합니다.
-- **`SellerServiceImpl`, `ProductServiceImpl`, `ReservationServiceImpl`:** 각 기능에 맞는 비즈니스 로직을 처리합니다.
+### Lesson Learned
+- 프론트엔드와 백엔드 분리 시 API 설계의 중요성
+- 모니터링 시스템 구축의 필요성
+- RESTful API 설계 원칙 준수의 필요성

@@ -41,12 +41,6 @@ import erd from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp';
 
 ## [사용 기술 스택]
 
-- Infra
-    - AWS : EC2, S3
-    - Docker
-    - Vite
-    - Nginx, DNS
-    - Gitlab CI/CD
 - BE
     - 개발 환경 : IntelliJ IDEA
     - 빌드 도구 : Gradle(8.7)
@@ -57,6 +51,12 @@ import erd from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp';
     - 개발 환경 : VS Code
     - 빌드 도구 : Node.js(v24), Vite(7.0.4)
     - 프레임워크 : Vue(3.5.17)
+- Infra
+    - AWS : EC2, S3
+    - Docker
+    - Vite
+    - Nginx, DNS
+    - Gitlab CI/CD
 - AI
     - 개발 환경 : Python(3.11)
     - 빌드 도구 : pip
@@ -100,6 +100,11 @@ import erd from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp';
 
 ## [트러블슈팅 & 문제 해결]
 
+- BE
+    - DB에 시간이 `UTC-9`가 아닌 `UTC`로 저장되는 문제 발생
+        - PostgreSQL과 EC2 인스턴스의 Time Zone을 `Asia/Seoul`로 설정했음에도 Spring Boot 애플리케이션은 여전히 UTC로 동작
+        - 원인은 Spring Boot가 JVM 기본 Time Zone을 따라가기 때문에, 서버 및 DB 설정만으로는 적용되지 않음을 확인
+        - 애플리케이션 실행 시 `@PostConstruct`를 통해 JVM TimeZone을 `Asia/Seoul`로 설정하여 문제 해결
 - Infra
     - HTTPS 적용 중 BE API가 정상적으로 호출되지 않는 문제
         - Nginx 설정 문제로 백엔드 프록시 설정을 제대로 처리하지 못하는 문제 발견
@@ -112,11 +117,6 @@ import erd from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp';
         - Redis는 단순 Master-Slave 구성만으로는 Failover가 되지 않음을 파악
         - Redis Sentinel을 도입하여 Master 장애 시 Slave가 자동 승격되도록 구현
         - 단, Master 컨테이너가 예기치 않게 종료된 원인은 끝내 규명하지 못해 개선 과제로 남김
-- BE
-    - DB에 시간이 `UTC-9`가 아닌 `UTC`로 저장되는 문제 발생
-        - PostgreSQL과 EC2 인스턴스의 Time Zone을 `Asia/Seoul`로 설정했음에도 Spring Boot 애플리케이션은 여전히 UTC로 동작
-        - 원인은 Spring Boot가 JVM 기본 Time Zone을 따라가기 때문에, 서버 및 DB 설정만으로는 적용되지 않음을 확인
-        - 애플리케이션 실행 시 `@PostConstruct`를 통해 JVM TimeZone을 `Asia/Seoul`로 설정하여 문제 해결
 
 ## [성과]
 
@@ -214,19 +214,16 @@ import erd from '../../assets/projects/GOLDEN_TICKET/GOLDENTICKET_ERD.webp';
 
 ## [회고]
 
-### Best Practice
-
-- DB는 정규화를 지켜서 잘 설계하였다고 생각이 됨
-- 필수적인 기능들을 잘 구현하였음
-- 빠른 MVP 배포를 통해 실 사용자 피드백을 받아 UI/UX를 개선한 것이 좋았음
-- 환경변수 관리가 잘 되었음. `.env` 파일과 `Gitlab Variable`로 환경 변수를 외부에서 주입하였는데, 보안적으로 잘 관리가 되었다고 생각함
-
-### Lesson Learned
-
-- 백엔드 개발에 다양한 기술 스택을 사용하지 못하여서 아쉬웠음
-- 백엔드 프로젝트를 설계할 때 계층형 구조로 설계를 하였는데, 프로젝트가 점점 커지게 되면서 원하는 파일을 찾기가 힘들어졌음. 다음 프로젝트에는 도메인형 패키지 구조를 도입해보고자 함
-- 프론트엔드와 소통이 부족했다고 생각됨. 충분한 설계를 하지 않고 백엔드를 먼저 구축하였는데, 프론트엔드가 개발됨에 따라 API를 수정해야 할 일이 많이 생기게 되었음. 백엔드 코드가 수정되면서 상대적으로 코드가 복잡해지게 되었음
-- EC2에 처음 배포를 해보았는데, 생각보다 어려웠음. Docker와 AWS 공부가 조금 더 필요하다는 생각이 들었음
-- Redis Sentinel을 적용해 Failover 구조를 구축했지만, 문제가 발생한 근본적인 원인이 무엇인지 해결하지 못해 아쉬움
-- Kafka를 적용하고자 하였으나 개발 시간이 부족하여 적용하지 못하여 아쉬움
-- 프로젝트를 진행하면서, 브랜치 관리가 조금 아쉬웠음. 사용한 브랜치는 삭제하면서 관리가 필요하다고 생각함
+- Best Practice
+    - DB는 정규화를 지켜서 잘 설계하였다고 생각이 됨
+    - 필수적인 기능들을 잘 구현하였음
+    - 빠른 MVP 배포를 통해 실 사용자 피드백을 받아 UI/UX를 개선한 것이 좋았음
+    - 환경변수 관리가 잘 되었음. `.env` 파일과 `Gitlab Variable`로 환경 변수를 외부에서 주입하였는데, 보안적으로 잘 관리가 되었다고 생각함
+- Lesson Learned
+    - 백엔드 개발에 다양한 기술 스택을 사용하지 못하여서 아쉬웠음
+    - 백엔드 프로젝트를 설계할 때 계층형 구조로 설계를 하였는데, 프로젝트가 점점 커지게 되면서 원하는 파일을 찾기가 힘들어졌음. 다음 프로젝트에는 도메인형 패키지 구조를 도입해보고자 함
+    - 프론트엔드와 소통이 부족했다고 생각됨. 충분한 설계를 하지 않고 백엔드를 먼저 구축하였는데, 프론트엔드가 개발됨에 따라 API를 수정해야 할 일이 많이 생기게 되었음. 백엔드 코드가 수정되면서 상대적으로 코드가 복잡해지게 되었음
+    - EC2에 처음 배포를 해보았는데, 생각보다 어려웠음. Docker와 AWS 공부가 조금 더 필요하다는 생각이 들었음
+    - Redis Sentinel을 적용해 Failover 구조를 구축했지만, 문제가 발생한 근본적인 원인이 무엇인지 해결하지 못해 아쉬움
+    - Kafka를 적용하고자 하였으나 개발 시간이 부족하여 적용하지 못하여 아쉬움
+    - 프로젝트를 진행하면서, 브랜치 관리가 조금 아쉬웠음. 사용한 브랜치는 삭제하면서 관리가 필요하다고 생각함

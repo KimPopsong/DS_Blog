@@ -1,6 +1,6 @@
 ---
-import { SITE_TITLE } from '../consts';
-import HeaderLink from './HeaderLink.astro';
+import { SITE_TITLE } from "../consts";
+import HeaderLink from "./HeaderLink.astro";
 ---
 
 <header>
@@ -13,16 +13,28 @@ import HeaderLink from './HeaderLink.astro';
 			<HeaderLink href="/project">Project</HeaderLink>
 		</div>
 		<div class="social-links">
+			<!-- GitHub -->
 			<a href="https://github.com/KimPopsong" target="_blank">
 				<span class="sr-only">Go to GitHub</span>
-				<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/github"
+				<svg
+					viewBox="0 0 16 16"
+					aria-hidden="true"
+					width="32"
+					height="32"
+					astro-icon="social/github"
 					><path
 						fill="currentColor"
 						d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
 					></path></svg
 				>
 			</a>
-			<a href="https://www.instagram.com/kimds5344/" target="_blank" aria-label="Go to Instagram">
+
+			<!-- Instagram -->
+			<a
+				href="https://www.instagram.com/kimds5344/"
+				target="_blank"
+				aria-label="Go to Instagram"
+			>
 				<span class="sr-only">Go to Instagram</span>
 				<svg
 					viewBox="0 0 32 32"
@@ -31,36 +43,56 @@ import HeaderLink from './HeaderLink.astro';
 					aria-hidden="true"
 					role="img"
 				>
-					<!-- 배경: 원형 (GitHub 아이콘과 동일 크기) -->
-					<circle cx="16" cy="16" r="16" fill="currentColor" />
-					<!-- 인스타 프레임 (크기 ↑) -->
-					<rect
-						x="8"
-						y="8"
-						width="16"
-						height="16"
-						rx="4.5"
-						ry="4.5"
-						fill="none"
-						stroke="#050814"
-						stroke-width="2.6"
-					/>
-					<!-- 렌즈 (크기 ↑) -->
-					<circle
-						cx="16"
-						cy="16"
-						r="4.8"
-						fill="none"
-						stroke="#050814"
-						stroke-width="2.6"
-					/>
-					<!-- 플래시 점 -->
-					<circle
-						cx="21"
-						cy="11"
-						r="1.5"
-						fill="#050814"
-					/>
+					<!-- 배경: 원형 (그대로 유지) -->
+					<circle cx="16" cy="16" r="16" fill="currentColor"></circle>
+
+					<!-- 인스타 로고 그룹 (중앙 기준 살짝 확대) -->
+					<g
+						transform="translate(16 16) scale(1.2) translate(-16 -16)"
+					>
+						<!-- 프레임 -->
+						<rect
+							x="8"
+							y="8"
+							width="16"
+							height="16"
+							rx="4.5"
+							ry="4.5"
+							fill="none"
+							stroke="#050814"
+							stroke-width="2.6"></rect>
+						<!-- 렌즈 -->
+						<circle
+							cx="16"
+							cy="16"
+							r="4.8"
+							fill="none"
+							stroke="#050814"
+							stroke-width="2.6"></circle>
+						<!-- 플래시 점 -->
+						<circle cx="21" cy="11" r="1.5" fill="#050814"></circle>
+					</g>
+				</svg>
+			</a>
+
+			<!-- Steam -->
+			<a
+				href="https://steamcommunity.com/id/kimds5344/"
+				target="_blank"
+				aria-label="Go to Steam"
+			>
+				<span class="sr-only">Go to Steam</span>
+				<svg
+					viewBox="0 0 256 256"
+					width="32"
+					height="32"
+					aria-hidden="true"
+					role="img"
+				>
+					<path
+						fill="currentColor"
+						d="M127.779 0C60.42 0 5.24 52.412 0 119.014l68.724 28.674a35.812 35.812 0 0 1 20.426-6.366c.682 0 1.356.019 2.02.056l30.566-44.71v-.626c0-26.903 21.69-48.796 48.353-48.796 26.662 0 48.352 21.893 48.352 48.796 0 26.902-21.69 48.804-48.352 48.804-.37 0-.73-.009-1.098-.018l-43.593 31.377c.028.582.046 1.163.046 1.735 0 20.204-16.283 36.636-36.294 36.636-17.566 0-32.263-12.658-35.584-29.412L4.41 164.654c15.223 54.313 64.673 94.132 123.369 94.132 70.818 0 128.221-57.938 128.221-129.393C256 57.93 198.597 0 127.779 0zM80.352 196.332l-15.749-6.568c2.787 5.867 7.621 10.775 14.033 13.47 13.857 5.83 29.836-.803 35.612-14.799a27.555 27.555 0 0 0 .046-21.035c-2.768-6.79-7.999-12.086-14.706-14.909-6.67-2.795-13.811-2.694-20.085-.304l16.275 6.79c10.222 4.3 15.056 16.145 10.794 26.46-4.253 10.314-15.998 15.195-26.22 10.895zm121.957-100.29c0-17.925-14.457-32.52-32.217-32.52-17.769 0-32.226 14.595-32.226 32.52 0 17.926 14.457 32.512 32.226 32.512 17.76 0 32.217-14.586 32.217-32.512zm-56.37-.055c0-13.488 10.84-24.42 24.2-24.42 13.368 0 24.208 10.932 24.208 24.42 0 13.488-10.84 24.421-24.209 24.421-13.359 0-24.2-10.933-24.2-24.42z"
+					></path>
 				</svg>
 			</a>
 		</div>

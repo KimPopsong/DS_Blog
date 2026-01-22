@@ -1,0 +1,92 @@
+---
+title: "JSP + Spring FE 트러블슈팅 정리"
+pubDate: 2026-01-22T19:35+09:00
+description: "FE 개발 중 궁금한 점 & 오류 수정 정리"
+tags: ["트러블슈팅", "FE"]
+---
+
+요즘 취직하고 이래저래 할 것이 많아서 제대로 된 글을 작성하지 못했습니다.
+
+회사에서 내어준 과제를 진행하며 겪은 문제를 정리했습니다.
+
+## 트러블 슈팅
+
+### 1. Overlay 문제
+  - 문제 : 요소가 다른 요소의 Overlay 순서가 꼬이는 문제
+  - 원인
+    - `z-index` 값이 잘못 들어가있음
+  - 해결 : `z-index`의 값을 요소 별로 적절히 배분
+
+### 2. 메인 화면 슬라이드 전환간 Button의 "선택 상태"
+  - 문제
+    - radio처럼 기본적으로 한 개가 선택되어 있어야 함
+    - 화면 전환 시 그에 맞는 버튼으로 자동으로 선택되어야 함
+    - 버튼을 클릭하면 그에 맞는 화면으로 전환되어야 함
+  - 원인
+    - `is-active`가 아닌 `active` 옵션 사용 및 EventListener 미활용
+  - 해결
+    - `is-active` 옵션 추가
+      ```html
+        <button type="button" class="home-toggle-btn is-active" id="alarmONButton">
+            알림<br>ON
+        </button>
+        <button type="button" class="home-toggle-btn" id="searchONButton">
+            검색<br>ON
+        </button>
+      ```
+    - `for-each`문을 활용해 버튼을 순회하며 상태 관리
+      ```js
+        buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            buttons.forEach(b => b.classList.remove('is-active'));
+                btn.classList.add('is-active');
+            });
+        });
+      ```
+    - JS를 활용해 화면 전환 구현(기존 코드 재활용)
+      ```js
+      alarmONButton.addEventListener('click', () => {
+          window.moveToSlide(0);
+      });
+
+      searchONButton.addEventListener('click', () => {
+          window.moveToSlide(1);
+      });
+      ```
+    - 추가로 궁금한 점
+      1. 왜 radio를 사용하지 않고 button을 사용할까?
+          - radio라는 편한 기능이 있는데, for-each 등을 활용해 button으로 구현하는 이유가 궁금해 찾아보았다.
+          - 디자인 제약
+            - 브라우저마다 모양이 다르고, 크기·색상·애니메이션 적용이 거의 불가능
+            - `border-radius`와 같은 CSS 직접 적용 불가
+          - 상호작용 제어가 제한적 : 클릭 영역이 작고, "눌렀다"는 피드백을 주기 어려움
+          - 아이콘 + 텍스트, 설명 문구, 카드 형태의 선택 UI 등 복잡한 상태 표현이 힘듦
+      2. window가 무엇인가?
+          - 브라우저 전체를 대표하는 최상위 객체로 탭 하나, 그 안의 페이지, 화면, 스크롤, 위치, 전역 변수 등 모든 것을 감쌈
+          - 버튼을 클릭하면 window 객체에서 moveToSlide 함수를 호출하여 인자를 전달
+          - `JS에서 전역으로 선언한 함수는 자동으로 window의 속성이 됨`
+          - 단순히 `moveToSlide`로 작성해도 되지만 아래 이유로 window를 명시
+            1. 전역 함수라는 것을 명확히 하기 위해
+            2. 이름 충돌 방지 및 의도 표현
+            3. 추후 구조 변경이 용이
+      3. 어떻게 바로 실행되는가?
+          ```js
+          (() => {
+            // 코드
+          })();
+          ```
+          - 마지막 `()`를 통해 JS 파일이 로드될 때 바로 호출
+## 기타 궁금한 점 등
+### FE의 동작 조건
+    1. HTML이 요소(노드)를 생성 : DOM 생성
+        - 브라우저가 HTML을 읽으면 `<div>` 같은 요소들이 DOM(Documented Object Model) 트리로 만들어짐
+        - JS는 DOM을 통해 요소를 제어할 수 있음
+    2. CSS가 어떻게 보여줄지 정의
+        - 레이아웃, 스타일, 애니메이션 등 결정
+    3. JS가 이벤트를 결정
+        - 이벤트가 발생했을 때 DOM/CSS 값을 바꿔서 화면 상태를 갱신
+    4. JS 실행 타이밍 조건
+        - JS가 DOM 요소를 잡으려면, 그 요소가 DOM에 이미 존재해야 함
+        - 스크립트가 너무 위에서 실행되거나, 요소 이름이 바뀌거나, 페이지마다 구조가 다르면 동작하지 않음
+### 이벤트 리스너란?
+    

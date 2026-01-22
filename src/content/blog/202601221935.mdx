@@ -13,8 +13,7 @@ tags: ["트러블슈팅", "FE"]
 
 ### 1. Overlay 문제
   - 문제 : 요소가 다른 요소의 Overlay 순서가 꼬이는 문제
-  - 원인
-    - `z-index` 값이 잘못 들어가있음
+  - 원인 : `z-index` 값이 잘못 들어가있음
   - 해결 : `z-index`의 값을 요소 별로 적절히 배분
 
 ### 2. 메인 화면 슬라이드 전환간 Button의 "선택 상태"
@@ -27,21 +26,21 @@ tags: ["트러블슈팅", "FE"]
   - 해결
     - `is-active` 옵션 추가
       ```html
-        <button type="button" class="home-toggle-btn is-active" id="alarmONButton">
-            알림<br>ON
-        </button>
-        <button type="button" class="home-toggle-btn" id="searchONButton">
-            검색<br>ON
-        </button>
+      <button type="button" class="home-toggle-btn is-active" id="alarmONButton">
+          알림<br>ON
+      </button>
+      <button type="button" class="home-toggle-btn" id="searchONButton">
+          검색<br>ON
+      </button>
       ```
     - `for-each`문을 활용해 버튼을 순회하며 상태 관리
       ```js
-        buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            buttons.forEach(b => b.classList.remove('is-active'));
-                btn.classList.add('is-active');
-            });
-        });
+      buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+          buttons.forEach(b => b.classList.remove('is-active'));
+              btn.classList.add('is-active');
+          });
+      });
       ```
     - JS를 활용해 화면 전환 구현(기존 코드 재활용)
       ```js
@@ -88,5 +87,75 @@ tags: ["트러블슈팅", "FE"]
     4. JS 실행 타이밍 조건
         - JS가 DOM 요소를 잡으려면, 그 요소가 DOM에 이미 존재해야 함
         - 스크립트가 너무 위에서 실행되거나, 요소 이름이 바뀌거나, 페이지마다 구조가 다르면 동작하지 않음
-### 이벤트 리스너란?
-    
+    - JS는 어떻게 이벤트를 받아 처리하고 화면을 구성할까?
+      - JS는 이벤트를 만드는 주체가 아닌, 이벤트를 기다리다 발생하면 처리하는 역할
+      - 이벤트 발생 -> 이벤트 객체 생성 -> 리스너 실행 -> 상태 변경 -> DOM/CSS 갱신 -> 브라우저가 다시 그림
+### 이벤트
+    - 이벤트란?
+      - 브라우저에서 발생하는 신호·사건
+      - 사용자 입력, 마우스, 화면·브라우저, 로딩 등
+      - 이벤트가 발생하면 브라우저는 Event 객체를 생성해 핸들러에게 전달
+    - 이벤트 핸들러란?
+      - 특정 이벤트가 발생했을 때 실행할 함수를 등록해두는 장치
+      - 구조
+          ```js
+          btnRight.addEventListener("click", () => { ... });
+          ```
+          - bntRight : 이벤트를 받을 대상
+          - click : 이벤트 종류
+          - `() => { ... }` : 이벤트 발생 시 실행할 콜백 함수
+    - 리스너만 있으면 이벤트를 다 받을 수 있을까?
+      - 아니다. 어디에 붙였는지와 전파에 따라 다름
+      - 이벤트는 타겟 요소에서 발생
+        - click은 실제 클릭한 요소에서 발생
+        - 그 요소에 리스너를 붙이면 확실히 받음
+      - 이벤트는 전파될 수 있음
+        - 대부분의 DOM 이벤트는 부모 방향으로 전파(Bubbling)되므로 자식에서 발생한 이벤트는 부모에서 받을 수도 있음
+      - 안받아지는 경우
+        - DOM 요소가 존재하기 전에 리스너를 단 경우
+        - `display: none`인 요소에 이벤트를 기대하는 경우
+        - 이벤트가 bubbling되지 않는 타입인 경우
+          - `focus, blur, mouseenter, mouseleave` 등
+        - stopPropagation()으로 중간에 끊긴 경우
+        - 다른 요소가 위에서 덮은 경우
+        - CustomEvent를 Dispatch하지 않은 경우
+    - 리스너는 다중 구조를 가질 수 있음
+      - 이벤트 전파(Event Propagation)
+        - 이벤트는 DOM 트리를 타고 이동하는데 순서가 있음
+        1. Capturing : 위(문서) -> 아래(타겟)로 내려감
+        2. Target : 실제 이벤트가 발생한 요소에서 처리
+        3. Bubbling : 아래(타겟) -> 위(문서)로 올라감
+        - 기본적으로 addEventListener는 Bubbling 단계에서 동작
+      - 이벤트 위임(Event Delegation)
+        - 자식이 많을 때 자식마다 리스너를 다는 것이 아니라, 부모 하나만 달아서 처리하는 패턴
+        - 자식에서 click 이벤트 발생 -> 이벤트가 부모로 Bubbling -> 부모 리스너가 `e.target`을 보고 어떤 자식이 눌렀는지 판별
+
+### Dispatch
+    - Listener는 듣고만 있고 dispatchEvent()는 이벤트가 발생했다고 브라우저에 알리는 행위
+    - addEventListener는 마이크를 켜둔 것이고, dispatchEvent는 실제로 말을 하는 것
+
+### index.jsp에서 슬라이드가 동작하는 과정
+    1. 초기화 후 즉시 실행
+    2. state 만들기
+        ```js
+        let index = 0;
+        const maxIndex = slides.length - 1;
+        ```
+    3. render()를 통해 화면 그리기
+        ```js
+        const render = () => {
+          track.style.transform = `translateX(-${index * 50}%)`;
+          btnLeft.classList.toggle("is-disabled", index === 0);
+          btnRight.classList.toggle("is-disabled", index === maxIndex);
+        };
+        ```
+        - 트랙 위치 갱신(transform)
+        - 버튼 UI 상태 갱신
+    4. 버튼 클릭 시 상태를 바꾸고 render()
+        ```js
+        btnRight.addEventListener("click", () => {
+          index = Math.min(maxIndex, index + 1);
+          render();
+        });
+        ```
+    5. 외부에서도 슬라이드를 이동할 수 있도록 공개

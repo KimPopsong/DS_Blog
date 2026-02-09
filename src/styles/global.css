@@ -23,21 +23,6 @@
 	--card-bg: rgba(15, 20, 35, 0.6);
 	--card-border: rgba(79, 140, 255, 0.2);
 }
-@font-face {
-	font-family: "Atkinson";
-	src: url("/fonts/atkinson-regular.woff") format("woff");
-	font-weight: 400;
-	font-style: normal;
-	font-display: swap;
-}
-@font-face {
-	font-family: "Atkinson";
-	src: url("/fonts/atkinson-bold.woff") format("woff");
-	font-weight: 700;
-	font-style: normal;
-	font-display: swap;
-}
-
 *,
 *::before,
 *::after {
@@ -50,7 +35,7 @@ html {
 	flex-direction: column;
 }
 body {
-	font-family: "Atkinson", sans-serif;
+	font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 	margin: 0;
 	padding: 0;
 	text-align: left;

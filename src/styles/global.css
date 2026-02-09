@@ -37,6 +37,13 @@
 	font-style: normal;
 	font-display: swap;
 }
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
 html {
 	min-height: 100vh;
 	display: flex;

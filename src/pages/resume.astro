@@ -165,6 +165,7 @@ if (resumeEntry) {
 			}
 			.resume-content :global(.profile-info) {
 				flex: 1;
+				min-width: 0;
 			}
 			.resume-content :global(.profile-info > p:first-child) {
 				margin-top: 0 !important;
@@ -180,6 +181,11 @@ if (resumeEntry) {
 			.resume-content :global(.profile-info p:has(strong) + p) {
 				margin-top: 0 !important;
 				margin-bottom: 0.5rem !important;
+			}
+			.resume-content :global(.profile-info p) {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
 			}
 			/* Activities 섹션 레이아웃 */
 			.resume-content :global(.activities-container) {
@@ -709,12 +715,12 @@ if (resumeEntry) {
 				.resume-content :global(li) {
 					font-size: 0.95rem;
 				}
-				.resume-content :global(.profile-container),
 				.resume-content :global(.activities-container),
 				.resume-content :global(.activity-item),
 				.resume-content :global(.projects-container) {
 					grid-template-columns: 1fr !important;
 				}
+				.resume-content :global(.profile-container),
 				.resume-content :global(.awards-container),
 				.resume-content :global(.awards-item),
 				.resume-content :global(.certifications-container),

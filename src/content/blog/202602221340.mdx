@@ -21,8 +21,9 @@ tags: ["트러블슈팅", "URLModifier", "docker"]
 docker ps
 docker inspect postgres
 ```
-- docker는 잘 동작하고 있고, PostgreSQL의 설정도 application.yaml의 username, password와 일치하는 것을 확인
-- docker 문제는 아니라고 판단
+- Docker 컨테이너는 정상적으로 실행 중임을 확인
+- POSTGRES_USER / POSTGRES_PASSWORD 값이 application.yaml과 일치함을 확인
+-> Docker 설정에는 문제가 없다고 판단
 
 #### 2. Windows에서 5432 포트 확인
 ```powershell
@@ -38,7 +39,7 @@ TCP 127.0.0.1:58844 127.0.0.1:5432 TIME_WAIT 0
 TCP 127.0.0.1:58850 127.0.0.1:5432 TIME_WAIT 0
 ```
 - `127.0.0.1:5432 LISTENING 32108` → 32108 이 5432 포트 사용 중
-- docker에 있는 image를 지우고 확인해봤는데, 무언가가 5432 포트를 사용하는 것을 확인
+- Docker 컨테이너를 중지하고 이미지를 제거한 뒤에도 5432 포트가 LISTENING 상태임을 확인
 
 #### 3. 32108 프로세스 확인
 ```powershell

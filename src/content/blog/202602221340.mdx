@@ -7,7 +7,7 @@ tags: ["트러블슈팅", "URLModifier", "docker"]
 
 로컬 개발 환경 구성 중 발생한 docker 관련 문제를 정리
 
-### 문제
+## 문제 상황
 - PostgreSQL : `password authentication failed for user "test"`
     ```
     FATAL: password authentication failed for user "test"
@@ -15,8 +15,8 @@ tags: ["트러블슈팅", "URLModifier", "docker"]
     ```
 - `application.yaml` / `docker-compose.yaml` 에서 DB 사용자와 비밀번호를 일치시켰는데도 인증이 실패하는 문제 발생
 
-### 진단 및 해결
-#### 1. Docker PostgreSQL 설정 정보 확인
+## 진단 과정
+### 1. Docker PostgreSQL 설정 정보 확인
 ```powershell
 docker ps
 docker inspect postgres
@@ -25,7 +25,7 @@ docker inspect postgres
 - POSTGRES_USER / POSTGRES_PASSWORD 값이 application.yaml과 일치함을 확인
 -> Docker 설정에는 문제가 없다고 판단
 
-#### 2. Windows에서 5432 포트 확인
+### 2. Windows에서 5432 포트 확인
 ```powershell
 netstat -ano | findstr :5432
 ```
@@ -41,7 +41,7 @@ TCP 127.0.0.1:58850 127.0.0.1:5432 TIME_WAIT 0
 - `127.0.0.1:5432 LISTENING 32108` → 32108 이 5432 포트 사용 중
 - Docker 컨테이너를 중지하고 이미지를 제거한 뒤에도 5432 포트가 LISTENING 상태임을 확인
 
-#### 3. 32108 프로세스 확인
+### 3. 32108 프로세스 확인
 ```powershell
 tasklist | findstr 32108
 ```
@@ -51,31 +51,36 @@ wslrelay.exe                 32108 Console                    1     11,956 K
 - 5432 포트를 사용하는 프로세스는 `wslrelay.exe`
 - `wslrelay.exe` → WSL2 내부에서 동작하는 프로세스
 
-#### 4. WSL2 내부에서 5432 포트 확인
+### 4. WSL2 내부에서 5432 포트 확인
 1. WSL 진입
-```powershell
-wsl
-```
+    ```powershell
+    wsl
+    ```
 2. WSL 내부에서 PostgreSQL 실행 확인
-```powershell
-ps aux | grep postgres
-```
-```powershell
-postgres     222  0.0  0.1 220264 30876 ?        Ss   13:20   0:00 /usr/lib/postgresql/16/bin/postgres -D /var/lib/postgresql/16/main -c config_file=/etc/postgresql/16/main/postgresql.conf
-postgres     244  0.0  0.0 220396  8504 ?        Ss   13:20   0:00 postgres: 16/main: checkpointer
-postgres     245  0.0  0.0 220416  5976 ?        Ss   13:20   0:00 postgres: 16/main: background writer
-postgres     296  0.0  0.0 220264 10272 ?        Ss   13:20   0:00 postgres: 16/main: walwriter
-postgres     297  0.0  0.0 221860  8144 ?        Ss   13:20   0:00 postgres: 16/main: autovacuum launcher
-postgres     298  0.0  0.0 221844  6664 ?        Ss   13:20   0:00 postgres: 16/main: logical replication launcher
-kimds       1670  0.0  0.0   4092  2008 pts/4    S+   13:35   0:00 grep --color=auto postgres
-```
+    ```powershell
+    ps aux | grep postgres
+    ```
+    ```powershell
+    postgres     222  0.0  0.1 220264 30876 ?        Ss   13:20   0:00 /usr/lib/postgresql/16/bin/postgres -D /var/lib/postgresql/16/main -c config_file=/etc/postgresql/16/main/postgresql.conf
+    postgres     244  0.0  0.0 220396  8504 ?        Ss   13:20   0:00 postgres: 16/main: checkpointer
+    postgres     245  0.0  0.0 220416  5976 ?        Ss   13:20   0:00 postgres: 16/main: background writer
+    postgres     296  0.0  0.0 220264 10272 ?        Ss   13:20   0:00 postgres: 16/main: walwriter
+    postgres     297  0.0  0.0 221860  8144 ?        Ss   13:20   0:00 postgres: 16/main: autovacuum launcher
+    postgres     298  0.0  0.0 221844  6664 ?        Ss   13:20   0:00 postgres: 16/main: logical replication launcher
+    kimds       1670  0.0  0.0   4092  2008 pts/4    S+   13:35   0:00 grep --color=auto postgres
+    ```
 3. PostgreSQL 서비스 종료
-```powershell
-sudo service postgresql stop
-```
+    ```powershell
+    sudo service postgresql stop
+    ```
 
-### 원인 : Docker PostgreSQL이 아니라 WSL PostgreSQL에 연결
+## 원인 : Docker PostgreSQL이 아니라 WSL PostgreSQL에 연결
 - WSL 안에서 PostgreSQL이 5432 포트로 동작
 - WSL이 해당 포트를 Windows `127.0.0.1:5432` 로 자동 포워딩
 - 따라서 Docker PostgreSQL이 아니라 WSL PostgreSQL에 붙음
 - 원격 환경과 Local 개발 환경을 분리하면서 docker-compose.yaml 파일을 수정했는데, WSL PostgreSQL에는 이전 정보가 남아있어 인증 실패
+
+## 해결 방법
+- WSL 내부에서 PostgreSQL 서비스를 중지해서 5432 포트를 비워둠
+- 이후 Docker PostgreSQL 컨테이너만 5432 포트를 사용하도록 유지
+- 로컬 개발 환경에서는 먼저 `netstat` / `tasklist` 로 실제로 어떤 프로세스가 포트를 점유하고 있는지 확인한 후, Docker 컨테이너가 맞는지 확인하는 습관 들이기

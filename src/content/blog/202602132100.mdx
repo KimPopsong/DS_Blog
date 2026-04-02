@@ -1,0 +1,91 @@
+---
+title: "URLModifier 프로젝트 트러블슈팅 - 순환 참조와 단일 책임"
+pubDate: 2026-02-13T21:00+09:00
+description: "URLModifier 개발 중 발생한 순환 참조 및 단일 책임 원칙 위배 문제 정리"
+tags: ["트러블슈팅", "URLModifier", "Spring Security"]
+---
+
+URLModifier 프로젝트에서 Spring Security 설정과 URL 관리 구조를 정리하는 과정에서 발생한 문제를 기록
+
+## 문제 상황
+1. 순환 참조 문제
+    - `jwtAuthenticationFilter` → `inMemoryUserDetailsManager` → `securityConfig` → `jwtAuthenticationFilter` 로 순환 참조 발생
+    - 애플리케이션 구동 시 Spring 컨테이너가 순환 의존성을 해결하지 못해 애플리케이션이 시작되지 않음
+2. 단일 책임 원칙 위배
+    - URL 삭제 / 상세 조회 기능을 `MyPageController` 에서 함께 처리하도록 구현
+    - "마이페이지에서 사용하는 URL"이라는 관점으로 묶었지만, 하나의 클래스는 하나의 책임만 가져야 한다는 단일 책임 원칙(SRP)을 위배하고 있다는 것을 인지
+
+## 진단
+### 1. 순환 참조 문제
+1. 순환 구조 파악
+    ```text
+    JwtAuthenticationFilter
+      └─ InMemoryUserDetailsManager (주입)
+           └─ SecurityConfig (Bean 정의)
+                └─ JwtAuthenticationFilter (Bean 정의)
+    ```
+    - `JwtAuthenticationFilter` 가 `UserDetailsService` 구현체로서 `InMemoryUserDetailsManager` 를 요구
+    - `InMemoryUserDetailsManager` 는 `SecurityConfig` 에서 Bean 으로 등록
+    - `SecurityConfig` 안에서 다시 `JwtAuthenticationFilter` 를 Bean 으로 등록하면서 순환 구조 완성
+2. PasswordEncoder 책임 분리
+    - 순환 고리를 끊기 위해 `SecurityConfig` 에 있던 `PasswordEncoder` Bean 정의를 `WebConfig` 로 분리
+    - 보안 설정(SecurityConfig)과 Web 전반 설정(WebConfig)의 책임을 명확히 나누면서, SecurityConfig 가 굳이 PasswordEncoder 를 직접 가지지 않도록 구조 변경
+    ```text
+    Before
+    - SecurityConfig
+      - PasswordEncoder Bean
+      - InMemoryUserDetailsManager Bean
+      - JwtAuthenticationFilter Bean
+    After
+    - WebConfig
+      - PasswordEncoder Bean
+    - SecurityConfig
+      - InMemoryUserDetailsManager Bean (PasswordEncoder 주입)
+      - JwtAuthenticationFilter Bean
+    ```
+3. 순환 참조 해소 확인
+    - 애플리케이션을 재기동하여 Spring 컨텍스트 로딩이 정상적으로 완료되는지 확인
+    - JWT 인증 필터가 정상적으로 동작하고, 로그인/인가 흐름이 문제 없이 수행되는 것을 확인
+
+### 2. 단일 책임 원칙 위배
+1. 초기 설계
+    - "마이페이지에서 쓰는 URL 이니까 관련된 건 다 `MyPageController` 에 몰아두자" 는 생각으로 설계
+    - URL 삭제, URL 상세 보기, 마이페이지 내 기타 기능까지 한 컨트롤러에 모으면서 점점 클래스가 비대해짐
+2. 문제 인식
+    - 컨트롤러가 점점 복잡해지면서 테스트 코드 작성이 어려워짐
+    - URL 관련 요구사항이 늘어날수록 `MyPageController` 코드 수정 범위가 계속 커짐
+    - 객체지향 설계 원칙(SOLID)을 다시 찾아보며, **"하나의 클래스는 하나의 책임만 가져야 한다"** 는 단일 책임 원칙을 재확인
+3. 책임 기준 재정의
+    - 화면 기준(마이페이지) 이 아니라 **도메인 기준(URL 관리)** 으로 책임을 나누는 것이 더 적절하다고 판단
+    - URL 생성/조회/수정/삭제와 같이 URL 리소스를 다루는 책임은 `URLController` 로 이동
+    - 마이페이지는 "어떤 URL 을 보여줄지" 만 결정하고, 실제 URL 조작은 URL 전용 컨트롤러에 위임
+4. URL 관련 기능 이동
+    ```text
+    Before
+    - MyPageController
+      - 마이페이지 조회
+      - URL 목록 조회
+      - URL 상세 조회
+      - URL 삭제
+    After
+    - MyPageController
+      - 마이페이지 조회 (뷰/레이아웃 중심)
+      - 마이페이지에서 사용할 데이터 조합
+    - URLController
+      - URL 목록 조회
+      - URL 상세 조회
+      - URL 삭제
+    ```
+    - URL 과 관련된 API 스펙은 `URLController` 에서만 관리되도록 정리
+    - 마이페이지는 뷰 역할에 집중하도록 단순화
+
+## 해결 방법
+### 1. 순환 참조 문제
+- `SecurityConfig` 에 있던 `PasswordEncoder` Bean 정의를 `WebConfig` 로 분리해서, 보안 설정과 Web 전반 설정의 책임을 나눔
+- `SecurityConfig` 에서는 `InMemoryUserDetailsManager` 와 `JwtAuthenticationFilter` 만 관리하고, `PasswordEncoder` 는 공통 설정으로 두어 순환 고리를 끊음
+- 애플리케이션을 재기동해 Spring 컨텍스트 로딩과 JWT 인증 필터 흐름이 정상적으로 동작하는지 확인
+
+### 2. 단일 책임 원칙 위배
+- URL 삭제 / 상세 조회 등 URL 관련 기능을 `MyPageController` 에서 분리해 `URLController` 로 이동
+- `MyPageController` 는 마이페이지 조회와 화면에 필요한 데이터 조합에 집중하고, URL 리소스를 다루는 책임은 `URLController` 가 전담하도록 구조를 정리
+- URL 관련 API 스펙은 `URLController` 에서만 관리되도록 해서, 요구사항 변경 시 수정 범위와 영향 범위를 줄임

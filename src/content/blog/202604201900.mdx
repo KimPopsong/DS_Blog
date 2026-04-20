@@ -1,0 +1,92 @@
+---
+title: "URLModifier 미니 PC 서버 구축"
+pubDate: 2026-04-20T19:00+09:00
+description: "WSL2 + Docker를 활용한 미니 PC 서버 구축 과정 정리"
+tags: ["URLModifier", "서버", "Docker", "WSL2"]
+---
+
+최소 2주마다 한 번씩 포스팅을 하려 했으나 귀찮아서 하지 않았습니다. URLModifier 프로젝트를 미니 PC에 올려 실제로 운영하기 위해 서버 환경을 구축 중인데 이에 관련한 포스팅 간단 작성.
+
+## 환경
+- OS: Windows (미니 PC 전용 서버)
+- WSL2 + Ubuntu 22.04
+- Docker Engine 29.4.0 / Docker Compose 5.1.3
+
+## 왜 Windows에 WSL2 + Docker Engine를 사용했는가
+순수 Ubuntu를 설치하는 것이 성능이나 안정성 면에서 더 유리하다. Windows 위에 Ubuntu를 올리는 구조기 때문에 Windows 업데이트, 로그인 등 다른 것들도 고려를 많이 해야하고, 컴퓨팅 파워에도 조금 더 영향이 있다.
+그럼에도 WSL2를 선택한 이유는 다음과 같다.
+1. 편의성 : 익숙한 환경이라 사용하기 편리하다.
+2. 호환성 : Windows 프로그램과 병행 사용 가능하다.
+3. 가장 중요한 이유로 이미 Windows가 설치되어 있어 OS를 교체하기 귀찮았다.
+
+그 외에 Docker Desktop을 사용하면 쉽게 설정할 수 있지만, 내부적으로 WSL2 VM을 별도로 띄우기 때문에 메모리 오버헤드가 크다. 그래서 서버 전용 미니 PC에서는 WSL2 안에 Docker Engine을 직접 설치하는 것이 리소스 효율 면에서 더 유리하다고 판단했다.
+
+## 구축 과정
+### 1. WSL2 + Ubuntu 설치
+PowerShell 관리자 권한으로 실행:
+```powershell
+wsl --install -d Ubuntu-22.04
+```
+
+### 2. Docker Engine 설치
+Ubuntu 터미널에서 실행:
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+### 3. 부팅 시 자동 시작 설정
+Windows 부팅 시 WSL2와 Docker, 컨테이너까지 자동으로 올라오도록 작업 스케줄러에 등록했다.
+PowerShell 관리자 권한으로 실행:
+```powershell
+$action = New-ScheduledTaskAction -Execute "wsl" -Argument "-d Ubuntu-22.04 -u root -- bash -c 'service docker start && cd /home/사용자명/URLModifier && docker compose up -d'"
+$trigger = New-ScheduledTaskTrigger -AtStartup
+Register-ScheduledTask -TaskName "WSL2 Docker AutoStart" -Action $action -Trigger $trigger -RunLevel Highest -Force
+```
+
+### 4. 프로젝트 빌드 및 실행
+```bash
+cd ~
+git clone https://github.com/kimds5344/URLModifier.git
+cd URLModifier/URLModifierBackend
+chmod +x gradlew
+./gradlew bootJar
+cd ..
+docker compose up -d
+```
+
+## 트러블슈팅
+### Docker 이미지 pull 실패
+`eclipse-temurin:17-jdk-slim` 태그를 찾지 못하는 문제가 발생했다.
+`eclipse-temurin:17` 태그로 변경하니 정상적으로 pull됐다.
+
+```dockerfile
+# Before
+FROM eclipse-temurin:17-jdk-slim
+
+# After
+FROM eclipse-temurin:17
+```
+
+### WSL2 DNS 문제
+`ping 8.8.8.8`은 되는데 `ping registry-1.docker.io`가 안 되는 문제가 발생했다.
+WSL2의 `/etc/resolv.conf`에 DNS 서버가 설정되지 않은 것이 원인이었다.
+```bash
+sudo nano /etc/resolv.conf
+```
+```
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+```
+
+## 앞으로 할 것
+- 포트 포워딩 (공유기 설정)
+- `.env` 파일 작성 (운영용 JWT_SECRET, DB 비밀번호 등 교체)
+- CI/CD 구축

@@ -1,0 +1,90 @@
+---
+title: "URLModifier 서버 OS 교체 및 SSH 원격 서버 구축"
+pubDate: 2026-04-25T19:00+09:00
+description: "OS 완전 갈아 엎음"
+tags: ["URLModifier", "서버", "SSH", "Ubuntu"]
+---
+
+## 개요
+이전 포스팅에서 Windows에 WSL2 + Docker로 미니 PC 서버 환경을 구축했는데, 너무 무거워서 프로젝트가 더 진행되기 전 OS를 교체했습니다.
+원격 접속 프로그램 등을 사용할 예정이었으나, 너무 무겁고 편집 등도 불편해서 OS를 Ubuntu로 완전 교체했습니다.
+Ubuntu USB 만드려고 야밤에 다이소 갔는데, 다이소에서 USB를 안팔아서 쿠팡 로켓배송으로 배달시킴.
+
+## 목표
+- 집에 있는 미니 PC에 Ubuntu Server를 설치
+- SSH로 원격 접속 가능한 개인 서버 구축
+- 키보드·마우스·모니터 연결없이 원격으로만 조작
+
+## 구축 과정
+### 1. OS 선택
+- 기존에는 Windows에 Ubuntu를 올린 상황이었으나 서버 용도로 사용할 예정이고, 가벼운 OS를 사용하려 함
+- Ubuntu Server를 선택
+    - GUI가 없어 가벼움
+    - 서버 용도에 적합
+    - SSH 원격으로 관리가 편함
+
+### 2. Ubuntu ISO 다운로드 및 설치
+- Ubuntu 공식 사이트에서 Ubuntu Server ISO 다운
+- 버전은 26.04 LTS로 안정성을 고려하면 24.04 LTS가 낫지만, 개인 프로젝트이기 때문에 최신 버전을 사용하기로 함
+- Rufus를 사용해 부팅 USB 제작 후 설치
+- 설치 후 계정·폰트 등 기본 설정
+
+### 3. SSH 설정
+1. 서버 IP 확인
+    ```bash
+    ip a
+    ```
+2. Windows에서 접속
+    ```bash
+    ssh 사용자명@192.168.0.26
+    ```
+    - 접속을 시도하니 경고가 발생
+        ```bash
+        WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
+        Host key verification failed.
+        ```
+    - 이전에 Windows에서 SSH로 연결 설정을 해놨는데, Ubuntu를 설치하며 SSH host key가 바뀌었기 때문에 경고 발생
+    - Windows에서 기존 known_hosts 정보 삭제하여 해결
+        ```bash
+        ssh-keygen -R IP
+        ```
+3. 고정 IP 설정
+    - 처음 서버 IP는 DHCP로 할당된 상태인데, 재부팅 후 IP가 바뀔 수 있으므로 Netplan 설정을 수정해 고정 IP로 변경
+4. 방화벽 설정
+    ```bash
+    sudo apt install ufw -y
+    sudo ufw allow OpenSSH
+    sudo ufw enable
+    ```
+    - 방화벽 설정을 통해 불필요한 접근 차단
+5. 외부 SSH 접속을 위한 포트포워딩
+    - 외부에서 집 서버로 SSH 접속하기 위해 공유기에서 포트포워딩을 설정
+    - 외부·내부 포트번호는 모두 2222번으로 맞춰주었음
+        ```text
+        외부 포트: 2222
+        내부 IP: 192.168.0.26
+        내부 포트: 2222
+        프로토콜: TCP
+        ```
+        - 2222번으로 수정하였기 때문에 방화벽에서도 2222번 포트를 허용해주어야 함
+    - 외부에서 접근하려면 공인 IP를 알아야 한다. 가장 쉬운 방법은 네이버에 내 IP를 검색
+    - 외부 IP로 어디서든 접근 가능하게 되었다.
+        ```bash
+        ssh 사용자명@외부IP -p 2222
+        ```
+## 이후 계획
+- Docker 설치 및 Docker Compose 설정
+- Nginx Reverse Proxy 설정
+- HTTPS 인증서 적용
+- CI/CD 구축
+- 도메인 연결
+
+예전에 프로젝트를 하면서 많이 했던 것들인데 일하면서 하려니 진도가 안나가고 했던 것들 또 하는 느낌이라 살짝 귀찮다.
+
+## 미니 PC 스펙
+- 이전 포스팅에서 미니 PC 스펙을 안적어놔서 메모차 작성
+1. OS : Ubuntu 26.04 LTS
+2. CPU : Intel Core i5-6600 @ 3.30GHz
+3. Memory : 16GB
+4. SSD : 128GB
+5. GPU : Intel HD Graphics 530 (내장)

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /c/Users/kimds/Desktop/*.md)",
+      "Bash(git config *)"
+    ]
+  }
+}

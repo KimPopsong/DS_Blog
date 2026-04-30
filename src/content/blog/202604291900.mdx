@@ -1,0 +1,119 @@
+---
+title: "URLModifier HTTPS 인증서 발급 및 URL 표시 버그 수정"
+pubDate: 2026-04-29T19:00+09:00
+description: "Certbot HTTPS 인증서 발급, 단축 URL 표시 형식 수정, 보안 설정"
+tags: ["URLModifier", "HTTPS", "보안"]
+---
+
+## 개요
+지난 포스팅에서 Ubuntu Server에 SSH를 구축하고 Docker 환경을 세팅했는데, 이번에는 HTTPS 인증서 발급하고 일부 수정 했습니다.
+
+## 목표
+- Certbot으로 Let's Encrypt HTTPS 인증서 발급
+- 단축 URL 화면 표시에서 `https://` 제거
+- 프론트엔드 이중 도메인 버그 수정
+- fail2ban 및 SSH 키 기반 로그인 보안 설정
+
+## 작업 과정
+### 1. Certbot HTTPS 인증서 발급
+#### 문제
+- nginx가 SSL 인증서 파일이 없어 재시작을 반복 (`Restarting (1)`)
+- `docker-compose.yaml`의 certbot 서비스에 `entrypoint`가 지정되어 있어 `certonly` 명령이 무시됨
+#### 해결 순서
+1. `nginx/conf.d/default.conf`의 HTTPS 블록 임시 주석 처리 → nginx 정상 기동
+2. `--entrypoint` 오버라이드로 인증서 발급
+3. HTTPS 블록 주석 해제 → `git pull` + `docker compose restart nginx`
+    ```bash
+    docker compose run --rm --entrypoint certbot certbot certonly \
+      --webroot \
+      -w /var/www/certbot \
+      -d urlcut.kr \
+      --email kimds5344@naver.com \
+      --agree-tos \
+      --no-eff-email
+    ```
+    - `--entrypoint certbot`을 붙이지 않으면 docker-compose의 entrypoint(certbot renew 루프)가 실행되어 `certonly`가 무시됨
+#### 결과
+- 인증서 저장 위치: `/etc/letsencrypt/live/urlcut.kr/fullchain.pem`
+- 만료일: **2026-07-28**
+- 자동 갱신: certbot 컨테이너가 12시간마다 `certbot renew` 실행
+
+### 2. 단축 URL 표시에서 `https://` 제거
+- 더 짧은 표시를 위해 화면에 표시되는 단축 URL을 `https://urlcut.kr/abc123` → `urlcut.kr/abc123`으로 변경
+
+### 3. 프론트엔드 URL 버그 수정
+#### 문제 1 — 링크 클릭 시 이중 도메인 (`https://urlcut.kr/urlcut.kr/abc123`)
+- `href`에 프로토콜 없는 URL을 넣으면 브라우저가 상대경로로 해석하는 문제
+```js
+// 변경 전
+:href="shortenedUrl"
+
+// 변경 후
+:href="'https://' + shortenedUrl"
+```
+#### 문제 2 — 마이페이지 복사 시 이중 도메인
+- `API_BASE_URL + '/' + url.shortenedUrl`로 이미 도메인이 포함된 URL에 도메인을 한 번 더 붙이는 문제
+```js
+// 변경 전
+navigator.clipboard.writeText(API_BASE_URL + '/' + url.shortenedUrl)
+
+// 변경 후
+navigator.clipboard.writeText(url.shortenedUrl)
+```
+#### 최종 URL 표시 규칙
+| 용도 | 형식 | 비고 |
+|------|------|------|
+| 화면 표시 | `urlcut.kr/abc123` | `https://` 없음 |
+| 클립보드 복사 | `urlcut.kr/abc123` | `https://` 없음 |
+| `<a href>` | `https://urlcut.kr/abc123` | 상대경로 방지용 |
+| QR코드 | `https://urlcut.kr/abc123` | 스캔 시 동작 |
+| Location 헤더 | `https://urlcut.kr/abc123` | 리다이렉트용 |
+
+### 4. 보안 설정
+#### fail2ban 설치
+```bash
+sudo apt update
+sudo apt install fail2ban -y
+sudo systemctl enable fail2ban
+```
+
+#### SSH 키 기반 로그인 설정
+1. 로컬에서 키 생성
+    ```bash
+    ssh-keygen -t ed25519 -C "home-server"
+    ```
+2. 공개키를 서버에 등록
+    ```bash
+    type %USERPROFILE%\.ssh\id_ed25519.pub | ssh bigmac@서버IP "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+    ```
+3. 서버에서 권한 설정
+    ```bash
+    chmod 700 ~/.ssh
+    chmod 600 ~/.ssh/authorized_keys
+    ```
+4. `/etc/ssh/sshd_config` 수정
+    ```text
+    PermitRootLogin no
+    PasswordAuthentication no
+    PubkeyAuthentication yes
+    ```
+5. 설정 적용 후 새 터미널에서 접속 테스트
+    ```bash
+    sudo systemctl restart ssh
+    ssh bigmac@서버IP
+    ```
+## 서버 반영 명령어
+```bash
+# 백엔드 변경 반영
+git pull && docker compose up -d --build app
+
+# 프론트엔드 변경 반영
+git pull && docker compose up -d --build fe-build nginx
+
+# 전체 재빌드
+git pull && docker compose up -d --build
+```
+
+## 이후 계획
+- CI/CD 구축
+- 모니터링 설정

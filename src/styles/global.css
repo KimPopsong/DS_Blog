@@ -116,6 +116,16 @@ input {
 }
 table {
 	width: 100%;
+	border-collapse: collapse;
+}
+th,
+td {
+	padding: 0.5rem 0.75rem;
+	text-align: left;
+	border-bottom: 1px solid var(--card-border);
+}
+thead th {
+	border-bottom: 2px solid var(--card-border);
 }
 img {
 	max-width: 100%;

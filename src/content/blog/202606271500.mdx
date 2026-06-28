@@ -1,0 +1,1314 @@
+---
+title: "기술 인터뷰 준비 - 데이터베이스"
+pubDate: 2026-06-27T15:00+09:00
+description: "데이터베이스 기술 면접 예상 질문과 답변 정리"
+tags: ["기술 인터뷰", "데이터베이스", "CS"]
+---
+
+# 기술 인터뷰 준비 - 데이터베이스
+
+문제 출처 : [https://github.com/VSFe/Tech-Interview](https://github.com/VSFe/Tech-Interview)
+
+## 키 (기본키 / 후보키 / 슈퍼키 / 외래키)
+1. Key(기본키, 후보키, 슈퍼키 등)에 대해 설명해 주세요.
+    
+    ```
+    1. 기본키
+    	- 후보키 중 대표로 선택된 키
+    	- NULL 불가, 중복 불가
+    2. 후보키
+    	- 슈퍼키 중 최소성과 유일성을 만족하는 키
+    	- 여러 개 존재할 수 있음
+    3. 슈퍼키
+    	- 행을 유일하게 식별할 수 있는 속성들의 집합
+    	- 최소성을 만족할 필요는 없음
+    4. 외래키
+    	- 다른 테이블의 기본키를 참조하는 칼럼
+    ```
+    
+2. 기본키는 수정이 가능한가요?
+    
+    ```
+    기본키는 UPDATE가 가능하지만 레코드의 식별자이므로 수정시
+    1. 다른 테이블의 외래키 cascade 영향
+    2. 참조 무결성 문제
+    3. 로그/트랜잭션 히스토리 불일치
+    등이 발생할 수 있습니다.
+    ```
+    
+3. MySQL의 경우 기본키를 설정하지 않아도 테이블이 만들어집니다. 어떻게 이게 가능한 건가요?
+    
+    ```
+    MySQL은 기본키를 설정하지 않아도 테이블이 만들어집니다.
+    1. 사용자가 PK를 정의한 경우 그 PK를 클러스터링 키로 사용
+    2. PK는 없지만 UNIQUE NOT NULL 인덱스가 있는 경우 그 것을 클러스터링 키로 사용
+    3. 둘 다 없는 경우 내부적으로 숨겨진 6Byte Row ID를 자동 생성
+    ```
+    
+    - 클러스터드 인덱스
+        - 테이블 자체가 하나의 B-Tree 인덱스 구조로 정렬되어 저장된 것
+        - 물리적 정렬을 유지
+    - Non-Clustered Index
+        - 도서관에서 책은 아무 곳에 있고 색인 카드만 정렬된 상태
+    - MySQL vs PostgreSQL
+        - MySQL InnoDB : PK가 기본 클러스터드 인덱스
+        - PostgreSQL : 기본적으로 Heap 구조. 클러스터드 인덱스 없음
+4. 외래키 값은 NULL이 들어올 수 있나요?
+    
+    ```
+    외래키 제약은 값이 있을 때만 체크 -> NULL이면 참조 무결성 검사에서 제외 -> 참조하는 대상이 없다는 의미
+    
+    NOT NULL을 붙이면 NULL 불가능
+    ```
+    
+5. 어떤 칼럼의 정의에 UNIQUE 키워드가 붙으면, 이 칼럼을 활용한 쿼리의 성능은 그렇지 않은 것과 비교해서 어떻게 다를까요?
+    
+    ```
+    MySQL에서 UNIQUE를 걸면 UNIQUE 인덱스가 자동 생성되므로 이것을 이용해 검색과 조회 속도를 높일 수 있음
+    
+    UNIQUE 인덱스 vs 일반 인덱스
+    중복 허용 여부의 차이, where email = ? 조건에서 결과가 최대 1건이라는 것이 보장되므로 최적화하기 좋음
+    ```
+    
+
+## RDB vs NoSQL
+
+1. RDB와 NoSQL의 차이에 대해 설명해 주세요.
+    
+    ```
+    1. RDB
+    	- 관계형 모델 기반
+    	- 정형화된 스키마 유지
+    	- SQL 기반으로 강력한 조회 기능 제공
+    	- ACID 트랜잭션 지원
+    		- 데이터 무결성/정합성 최우선
+    2. NoSQL
+    	- 스키마가 유연하거나 느슨함
+    	- 수평 확장 용이
+    	- 일반적으로 JOIN이 없고 데이터 중복/중첩 허용
+    ```
+    
+2. NoSQL의 강점과 약점이 무엇인가요?
+    
+    ```
+    1. 강점
+    	- 수평 확장이 쉬움
+    	- 스키마 유연성
+    	- 성능이 매우 빠름
+    	- 비정형 데이터 저장 용이
+    2. 단점
+    	- 데이터 정합성 관리 책임이 애플리케이션에 있음
+    	- JOIN이 없으므로 데이터 중복이 발생할 수 있음
+    	- 트랜잭션 지원이 약함
+    	- 복잡한 쿼리 처리에 약함
+    ```
+    
+3. RDB의 어떠한 특징 때문에 NoSQL에 비해 부하가 많이 걸릴 수 있을까요?
+    
+    ```
+    1. ACID 트랜잭션을 강하게 보장
+    2. 제약조건의 유지 비용
+    	- PK 중복 금지
+    	- FK 참조 무결성
+    	- UNIQUE INDEX 중복 체크
+    3. JOIN 처리 비용
+    ```
+    
+4. NoSQL을 활용한 경험이 있나요? 있다면 왜 RDB를 선택하지 않고 해당 DB를 선택했나요?
+    
+    ```
+    채팅 시스템에서는 메시지가 빠르게 들어오고 메시지 구조가 자주 바뀌며 수평 확장이 중요함
+    
+    그래서 유연하게 저정할 수 있고 쓰기 성능이 높은 NoSQL 선택
+    ```
+    
+
+## 트랜잭션과 ACID
+
+1. 트랜잭션이 무엇이고 ACID 원칙에 대해 설명해 주세요.
+    
+    ```
+    하나의 논리적 작업 단위를 이루는 SQL 연산을 묶어서 전부 성공하거나 전부 실패하도록 보장하는 기능
+    
+    A : Atomicity. 트랜잭션의 작업들은 모두 성공하거나 전혀 수행되지 않아야 함
+    C : Consistency. 트랜잭션 전후로 DB의 제약조건이 항상 만족되어야 함
+    I : Isolation. 여러 트랜잭션이 동시에 실행될 때 서로의 중간 상태가 보이지 않도록 보호
+    D : Durability. Commit된 데이터는 영구히 보존되어야 함
+    ```
+    
+2. ACID 원칙 중 Durability를 DBMS는 어떻게 보장하나요?
+    
+    ```
+    WAL(Write-Ahead Logging)과 디스크 플러시로 보장
+    
+    1. WAL
+    	- 실제 데이터를 디스크에 쓰기 전에, 변경 내용을 로그에 먼저 기록
+    2. Commit시 디스크 플러시
+    	- Commit() 호출 시 redo log 파일이 디스크에 물리적으로 기록될 때까지 기다림
+    3. Double-Write Buffer
+    	- MySQL InnoDB는 페이지 손상 방지를 위해 double-write 영역에 두 번 기록하여 복구 정확성을 높임
+    ```
+    
+3. 트랜잭션을 사용해 본 경험이 있나요? 어떤 경우에 사용할 수 있나요?
+    
+    ```
+    트랜잭션을 여러 테이블을 동시에 갱신해야 하거나, 일부만 성공하면 안 되는 작업에서 사용했습니다. 예를 들어 결제 승인 후 상태 업데이트와 장부 기록을 하나의 트랜잭션으로 묶어 처리해 중간 실패 시 rollback 하도록 했습니다.
+    ```
+    
+4. 읽기에는 트랜잭션을 걸지 않아도 될까요?
+    
+    ```
+    읽기에는 트랜잭션이 필수는 아니다.
+    
+    트랜잭션을 걸 경우 성능이 떨어질 수 있음
+    
+    일관된 읽기 가 필요할 때
+    	- 보고서 생성
+    	- 결제 내역 집계
+    	- 재고 조회 시 불일치 문제 방지
+    ```
+    
+
+## 트랜잭션 격리 수준
+
+1. 트랜잭션 격리 레벨에 대해 설명해 주세요.
+    
+    ```
+    1. Read Uncommitted
+    	- 커밋되지 않은 데이터를 읽어 Dirty Read 발생 가능
+    	- 발생 가능한 문제
+    		- Dirty Read
+    		- Non-repeatable Read
+    		- Phantom Read
+    2. Read Committed
+    	- Commit된 데이터만 읽어 Dirty Read 방지
+    	- 하지만 SELECT마다 최신 값을 읽음
+    	- 발생 가능한 문제
+    		- Non-repeatable Read
+    		- Phantom Read
+    3. Repeatable Read
+    	- 트랜잭션이 시작된 시점의 스냅샷을 계속 읽어 Non-repeatable Read 방지
+    	- 발생 가능한 문제
+    		- Phantom Read(이론상)
+    		- MySQL의 InnoDB는 논리적으로 Phantom Read를 MVCC로 방지
+    4. Serialiable
+    	- 모든 읽기를 SELECT FOR SHARE처럼 관리
+    	- 성능 저하가 큼
+    ```
+    
+    - Phantom Read
+        - 같은 트랜잭션 안에서 동일한 조건의 SELECT를 두 번 실행했을 때 첫 번째에는 없던 row(or 더 많거나 적은 row)가 두 번째 SELECT에서 나타나는 현상
+            
+            ```sql
+            -- 트랜잭션 A
+            BEGIN;
+            SELECT * FROM orders WHERE price > 1000;
+            -- 결과: 10 rows
+            
+            -- 트랜잭션 B
+            BEGIN;
+            INSERT INTO orders (id, price) VALUES (999, 2000);
+            COMMIT;
+            
+            -- 트랜잭션 A가 다시 SELECT
+            SELECT * FROM orders WHERE price > 1000;
+            -- 결과: 11 rows (새로운 row 등장)
+            ```
+            
+    - MySQL InnoDB는 어떻게 Phantom Read를 막을까?
+        1. MVCC 스냅샷 읽기(일반 SELECT)
+            - 각 row에는 생성 트랜잭션 ID, 삭제 트랜잭션 ID 같은 버전 정보가 있음
+            - 트랜잭션 T가 시작되면 그 시점의 활성 트랜잭션 목록 + 자신의 ID로 스냅샷 생성
+            - 일반 SELECT는 이 스냅샷 기준으로 row를 보여줌 → 다른 트랜잭션이 INSERT 등을 해도 내 스냅샷 기준으로는 반영되지 않은 것으로 처리
+        2. Gap Lock + Next-Key Lock(락이 걸리는 SELECT)
+            - Phantom Read의 본질은 내가 처리 중인 범위 안에 새로운 행이 들어오는 것
+            - InnoDB는 범위 조건으로 row를 잡는 순간, 그 범위에 대해 “행 + gap”까지 잠금
+            
+            ```sql
+            amount 인덱스 값 (정렬 순서):
+              50, 100, 200, 300
+              
+            -- 트랜잭션 A
+            BEGIN;
+            SELECT * FROM orders
+            WHERE amount BETWEEN 100 AND 200
+            FOR UPDATE;
+            ```
+            
+            - InnoDB는 단순히 amount = 100, 200 행만 잠그지 않고 인덱스 상 [100, 200]을 잠금
+    - MVCC(Multi-Version Concurrency Control)
+        - DB가 동시성을 높이기 위해 사용하는 기술
+        - 한 행의 여러 버전을 동시에 유지하고 트랜잭션마다 자신이 봐야 할 버전만 선택해서 읽도록 하는 방식
+        - DB 동시성 제어 방식 중 가장 단순한 방식은 Lock → 트래픽이 많을 수록 느려짐
+        - MVCC는 읽기는 과거 버전을 읽고, 쓰기는 새로운 버전만 쓰자 → 동시성 상승 + 정합성 유지
+    - SELECT FOR SHARE
+        - 데이터를 읽으면서 해당 row에 공유락을 걸어 다른 트랜잭션이 변경하지 못하게 하는 것
+        
+        | 구분 | SELECT FOR SHARE | SELECT FOR UPDATE |
+        | --- | --- | --- |
+        | 락 종류 | Shared Lock | Exclusive Lock |
+        | UPDATE/DELETE 차단 | O | O |
+        | 다른 SELECT FOR SHARE 병행 | O | O |
+        | 다른 SELECT FOR UPDATE 병행 | O | X |
+        | 용도 | 읽기 보호 | 수정 예정 데이터 보호 |
+2. 모든 DBMS가 4개의 레벨을 모두 구현하고 있나요? 그렇지 않다면 그 이유는 무엇일까요?
+    
+    ```
+    모든 DBMS가 격리 레벨을 그대로 구현하는 것은 아님
+    
+    1. DB 구조 차이
+    	- Oracle은 Read Consistency를 강하게 보장하므로 Repeatable Read를 별도 구현할 필요가 없음
+    	- MySQL과 PostgreSQL은 서로 다른 방식으로 MVCC 구현
+    2. 락 모델 구현 방식 차이
+    	- 어떤 DB는 Serializable을 락 기반으로
+    	- 어떤 DB는 MVCC + 검증 방식으로 구현
+    3. 성능 vs 일관성의 Tradeoff
+    ```
+    
+3. 만약 MySQL을 사용하고 있다면 Undo 영역와 Redo 영역에 대해 설명해 주세요.
+    
+    ```
+    1. Undo log
+    	1. Rollback을 위해 이전 값 저장
+    		- UPDATE/DELETE 발생 시 변경 전을 Undo에 저장
+    		- ROLLBACK시 Undo log 기준으로 복구
+    	2. MVCC 스냅샷 제공
+    		- SELECT시 트랜잭션 스냅샷을 만들기 위해 Undo에서 과거 버전 데이터를 읽음
+    		- 단순 Rollback이 아니라 격리 레벨 구현의 핵심
+    	- 예) Repeatable Read : 트랜잭션 시작 시점의 Undo 로그를 따라가며 과거 버전을 보여줌
+    2. Redo log
+    	- Commit된 데이터를 디스크 손실 없이 보존하기 위한 로그
+    	- Write-Ahead Logging 구조
+    	- Crash 발생해도 커밋된 상태를 복구하기 위한 로그
+    	- 두 단계 존재
+    		1. Redo log buffer(메모리)
+    		2. Redo log file(디스크)
+    ```
+    
+    | 상황 | 사용되는 로그 |
+    | --- | --- |
+    | COMMIT 안 된 트랜잭션 | UNDO 로그로 전부 취소 |
+    | COMMIT 됐지만 데이터 파일에 덜 써진 경우 | REDO 로그로 다시 적용 |
+    - 예시
+        - 트랜잭션 T : A 계좌에서 10,000원 빼고 B 계좌에 10,000원 더하기
+            
+            ```sql
+            UPDATE account SET balance = balance - 10000 WHERE id = 'A';
+            UPDATE account SET balance = balance + 10000 WHERE id = 'B';
+            COMMIT;
+            ```
+            
+            - 중간에 장애 발생
+            - A에서 10000원 뺐는데, B에 10000원 더하기 전에 서버 다운/전원 장애
+            - 이때 지켜야 할 원칙
+                1. Atomicity : 둘 다 반영되거나, 둘 다 반영되지 않거나
+                2. Durability : COMMIT 되었다면 장애가 나도 결과가 남아 있어야 함
+        - UNDO Log : 되돌리기용
+        - REDO Log : 다시 적용하기용
+    - UNDO Log
+        - 변경 전을 기록해 두는 로그
+        - 나중에 트랜잭션이 실패/롤백시 이걸 보고 롤백
+        
+        ```sql
+        UPDATE account SET balance = 90000 WHERE id = 'A'; -- 원래는 100000
+        ```
+        
+        - UNDO Log에 “account(id='A') balance: 100000 → 90000”
+        - 이 중 100000 (이전 값) 을 기록
+        - 나중에 롤백시 UNDO 로그를 보고 반대로 수행
+        - 역할
+            1. 트랜잭션 롤백
+            2. MVCC 스냅샷 제공
+                - 과거 버전 데이터를 UNDO 영역에 보관
+                - 다른 트랜잭션들이 옛날 시점의 스냅샷을 읽을 수 있게
+        - Atomicity 보장
+    - REDO Log
+        - 변경 후를 기록하는 로그
+        - Commit된 트랜잭션이 디스크에 완전히 반영되기 전에 장애 나도, REDO 로그를 보고 다시 재생해서 복구 가능
+        
+        ```sql
+        UPDATE account SET balance = 90000 WHERE id = 'A'; -- 원래 100000
+        ```
+        
+        - REDO Log에 “account(id='A') balance: 90000 으로 바뀜” 이라는 정보가 들어감
+        - 실제 동작
+            1. 메모리 버퍼에서 페이지 수정
+            2. REDO 로그를 디스크에 순차 기록(Write-Ahead Loggin)
+            3. 나중에 시간이 될 때 더티 페이지를 디스크 테이블 파일에 Flush
+            - 만약 2까지 하고, 3 전에 서버가 죽었다면
+                - 디스크의 실제 데이터 파일에는 아직 balance = 100000일 수 있음
+                - 그러나 REDO Log에는 90000으로 바꾸라는 기록이 남아있음
+                - 재시작 시, REDO 로그를 읽어서 다시 반영
+        - Durability 보장
+    
+    | 항목 | MySQL UNDO | MySQL REDO | PostgreSQL UNDO(dead tuple) | PostgreSQL WAL |
+    | --- | --- | --- | --- | --- |
+    | 보관 기준 | 오래된 트랜잭션이 참조하는 동안 | 파일 사이즈로 순환 | VACUUM 이전까지 | checkpoint 전 후 + archive 설정 |
+    | 언제 삭제? | 트랜잭션이 끝나고 아무도 참조 안 하면 | checkpoint 이후 덮어쓰기 | VACUUM 시 cleanup | checkpoint 후 삭제 or archive |
+    | 기간 기반? | X | X | X | O
+    archive 모드에서만 가능 |
+4. 스토리지 엔진이 정확히 무엇인가요?
+    
+    ```
+    MySQL이 데이터를 디스크에 저장하고 읽고 쓰고 인덱싱하고 트랜잭션을 처리하는 내부 모듈
+    
+    대표 스토리지 엔진
+    1. InnoDB
+    2. MyISAM
+    3. Memory Engine
+    
+    스토리지 엔진을 분리한 이유
+    1. 유연한 선택성
+    	- 트랜잭션 필요하면 InnoDB
+    	- 보고서나 로그성 읽기 많은 경우 MyISAM
+    2. 특정 워크로드에 최적화된 엔진 선택 가능
+    3. 데이터 저장 방식/인덱스 방식/락 방식이 엔진마다 다름
+    ```
+    
+
+## 인덱스
+
+1. 인덱스가 무엇이고, 언제 사용하는지 설명해 주세요.
+    
+    ```
+    인덱스란 RDBMS에서 원하는 데이터를 빠르게 찾기 위해 정렬된 자료구조를 별도로 만들어두는 것으로 테이블 전체를 스캔하지 않고 빠르게 탐색 가능합니다.
+    
+    언제 사용하는가?
+    1. WHERE 조건이 자주 사용될 때
+    2. JOIN 조건으로 자주 사용될 때
+    3. ORDER BY/GROUP BY 최적화가 필요할 때
+    4. 중복 검사 필요할 때
+    
+    인덱스가 없을 때 -> Full Table Scan
+    인덱스가 있을 때 -> B+Tree 탐색 -> O(log N)
+    ```
+    
+2. 일반적으로 인덱스는 수정이 잦은 테이블에선 사용하지 않기를 권합니다. 왜 그럴까요?
+    
+    ```
+    1. 인덱스는 항상 정렬 상태를 유지해야 함
+    	- INSERT/UPDATE/DELETE가 발생하면 B+Tree에서 노드를 다시 정렬해야 함 -> Page Split, Page Merge 발생 -> 디스크 I/O 증가
+    2. 쓰기 부하 증가
+    	- 데이터 쓰기, 인덱스 쓰기 두 번의 쓰기 작업 필요
+    3. 인덱스가 많을수록 쓰기 성능이 지수적으로 저하
+    ```
+    
+    - Page Split/Page Merge
+        - 왜 필요할까?
+            - 인덱스는 정렬된 B+Tree 구조로 유지되야 하는데, 삽입·삭제 과정에서 페이지의 공간이 부족하거나 과하게 비면 트리의 균형이 깨짐
+        - 왜 중요한가?
+            - 성능 영향이 큼
+            - Page Split
+                - Random Insert가 많은 경우 심각한 성능 저하
+                - 특히 높은 Write 시스템에서 문제됨
+                - 인덱스가 파편화 될 수 있음 → 쿼리 성능 하락
+            - Page Merge
+                - Delete-Heavy 환경에서 비용 발생
+                - 불필요한 Merge가 많으면 전체 트리 재조정 비용 증가
+        - 순차 증가 키를 쓰면 Split이 거의 없음
+        - Page Split : 페이지(노드)가 꽉 찼을 때 찢어서 나누는 과정
+            - 인덱스 페이지가 꽉 찬 상태에서 새로운 키를 삽입해야 할 때
+            - 과정
+                1. 기존 페이지가 FULL 상태
+                2. 새로운 키를 넣을 수 없음
+                3. DB가 내부적으로 새 페이지를 만들고, 기존 데이터를 두 페이지로 나눔
+                4. 상위 노드가 새로운 페이지의 포인터를 추가하여 트리 구조를 재정렬
+            - 결과
+                1. 트리 높이 증가 → 검색 비용 증가(O(log N))
+                2. 쓰기 성능 하락
+                3. INSERT 성능 저하
+                4. Random Insert가 많은 경우 Split이 자주 발생
+            - 예시
+                
+                ```
+                [10 | 20 | 30 | 40]
+                ```
+                
+                - Leaf Page가 다음과 같이 꽉 차있을 때 25를 삽입하면
+                
+                ```
+                Page 1: [10 | 20]
+                Page 2: [25 | 30 | 40]
+                ```
+                
+                - 페이지가 찢어지고 상위 노드에 포인터가 갱신
+        - Page Merge : 페이지가 너무 비어서 합치는 과정
+            - 삭제로 인해 페이지가 너무 비어서 최소 용량(Threshold)에 못 미칠 때
+            - 과정
+                1. 삭제로 인해 페이지가 거의 비어버림
+                2. DB가 이웃 페이지와 병합할지 판단
+                3. 두 페이지를 합침
+                4. 상위 노드에서 포인터 제거
+            - 결과
+                1. 트리 높이가 줄어들 수 있음
+                2. Merge도 비용이 있기 때문에 삭제가 잦은 시스템에서는 성능 저하 가능
+            - 예시
+                
+                ```
+                Page 1: [10]
+                Page 2: [20 | 30 | 40]
+                ```
+                
+                - Page 1이 너무 비어있으면 Merge
+                
+                ```
+                Merged Page: [10 | 20 | 30 | 40]
+                ```
+                
+3. 앞 질문에 대해, 그렇다면 인덱스에서 사용하지 않겠다고 선택한 값은 위 정책을 그대로 따라가나요? → 인덱스를 안 쓰고 Full Scan을 하면 DB가 정책적으로 강제하나요?
+    
+    ```
+    인덱스 생성 여부는 개발자가 결정함 -> 정책은 권장사항이지 자동 적용되는 규칙이 아님
+    ```
+    
+4. ORDER BY/GROUP BY 연산의 동작 과정을 인덱스의 존재 여부와 연관지어서 설명해 주세요.
+    
+    ```
+    1. ORDER BY
+    	- 인덱스가 없다면 모든 데이터를 읽어 메모리에 올리고 정렬(Sort Buffer)에서 정렬 연산 수행 -> 비용이 매우 큼(Filesort 발생)
+    	- 인덱스가 있다면 이미 정렬된 구조이므로 정렬 작업 없이 정렬된 순서로 읽기만 하면 
+    2. GROUP BY
+    	- 그룹핑 컬럼에 인덱스가 없으면 전체 데이터 스캔 -> 정렬 -> 그룹화 -> 비용 큼
+    	- 그룹핑 키가 인덱스의 선두 컬럼이면 인덱스가 같은 값끼리 묶여 있음 -> 메모리/디스크 엔진이 빠르게 그룹화 가능 -> 정렬 없이 GROUP BY 가능
+    ```
+    
+5. 기본키는 인덱스라고 할 수 있을까요? 그렇지 않다면, 인덱스와 기본키는 어떤 차이가 있나요?
+    
+    ```
+    기본키는 논리적 개념으로 특정 행을 유일하게 식별하는 컬럼
+    인덱스는 물리적 구조로 빠른 조회를 위한 B+Tree 구조
+    MySQL에서 기본키는 클러스터드 인덱스. 하지만 모든 인덱스가 기본 키는 아님
+    ```
+    
+6. 그렇다면 외래키는요?
+    
+    ```
+    외래키는 다른 테이블의 값을 참조하는 무결성 제약조건으로 인덱스가 아님
+    하지만 대부분 DBMS는 FK 컬럼에 인덱스를 만드는 것을 강력히 권장
+    	- 부모를 삭제할 때 자식 테이블에서 탐색 필요
+    	- FK 검증 시 인덱스 없으면 Full Scan 발생
+    ```
+    
+7. 인덱스가 데이터의 물리적 저장에도 영향을 미치나요? 그렇지 않다면, 데이터는 어떤 순서로 물리적으로 저장되나요?
+    
+    ```
+    1. MySQL
+    	- 기본키 순서대로 데이터 페이지에 저장
+    	- 클러스터드 인덱스
+    	- Secondary Index는 PK를 주소로 가지고 있음
+    2. PostgreSQL
+    	- 테이블은 Heap 파일 형태로 저장
+    	- 어떤 인덱스도 물리적 저장 순서에 영향 X
+    	- 인덱스는 별도로 존재하는 논클러스터드 구조
+    ```
+    
+8. 우리가 아는 RDB가 아닌 NoSQL은 인덱스를 갖고 있나요? 만약 있다면 RDB의 인덱스와는 어떤 차이가 있을까요?
+    
+    ```
+    NoSQL에도 인덱스가 있으나 엔진과 모델별로 구조가 다름
+    - MongoDB -> B-Tree 기반 인덱스
+    - Elasticsearch -> 역색인(Inverted Index)
+    - Redis -> Hash/SkipList/Tree 기반
+    - Cassandra -> LSM Tree 기반 인덱스
+    
+    RDB 인덱스와의 차이
+    1. 데이터 모델
+    	- RDB : 정형(테이블)
+    	- NoSQL : 문서/컬럼/KV/그래프
+    2. 일관성
+    	- RDB : ACID 강화
+    	- NoSQL : Eventually Consisntent
+    3. 인덱스 목적
+    	- RDB : JOIN/정렬 등
+    	- NoSQL : 빠른 검색, 수평 확장
+    4. 구조
+    	- RDB : B+Tree 중심
+    	- NoSQL : LSM, Inverted Index 등 다양
+    5. 유지 방식
+    	- RDB : 실시간 균형 유지
+    	- NoSQL : 비동기/배치 작업 가능
+    ```
+    
+9. (A, B)와 같은 방식으로 인덱스를 설정한 테이블에서 A 조건 없이 B 조건만 사용하여 쿼리를 요청했습니다. 해당 쿼리는 인덱스를 탈까요?
+    
+    ```
+    복합 인덱스는 왼쪽 정렬 원칙(Left-most Prefix)을 따름
+    (A) -> (A, B) -> (A, B, C) 순서로만 인덱스를 탈 수 있음
+    
+    B 단독 조건이면 인덱스를 타지 않음
+    ```
+    
+
+## 클러스터링 / 레플리케이션 / 샤딩
+
+1. RDBMS, NoSQL에서의 클러스터링/레플리케이션 방식에 대해 설명해 주세요.
+    
+    ```
+    - RDBMS
+    	1. Master-Slave 구조
+    		- Master는 쓰기, Slave는 읽기 담당
+    		- 동기화 방식
+    			1. Async
+    				- Master가 쓰기 완료 -> Slave는 나중에 따라옴
+    				- 빠르지만 정합성 깨질 수 있음
+    			2. Semi-Sync
+    				- Master는 Slave 중 1대가 수신했을 때만 commit
+    				- Async와 Sync의 중간
+    			3. Sync
+    				- 모든 Slave 반영 완료 후 commit
+    				- 데이터 정합성이 가장 좋지만 매우 느림
+    		- Clustering
+    			- Master 장애 시 Slave가 자동 승격
+    - NoSQL
+    	1. Cassandra
+    		- Peer-to-Peer 구조
+    		- Master 없고 모든 노드가 동일한 역할
+    		- Gossip Protocol로 상태 공유
+    		- Eventual Consistency 모델
+    		- Replication Factor 설정(3으로 설정하면 데이터를 3개의 노드에 복제)
+    	2. MongoDB
+    		- Replica Set 구조
+    		- Primary : 쓰기 담당
+    		- Secondary : 읽기 + 복제
+    		- 자동 Failover
+    		- Write Concern / Read Preference로 정합성 조절
+    	3. Redis Cluster
+    		- Sharding + Replication 내장
+    		- Hash Slot 기반 샤딩
+    		- Master-Slave 구성
+    ```
+    
+2. 이러한 분산 환경에서는 트랜잭션을 어떻게 관리할 수 있을까요?
+    
+    ```
+    1. 2PC(Two-Phase Commit)
+    	- Coordinator(조정자)가 모든 노드에 commit 준비 요청
+    	- 모든 노드가 OK -> commit
+    	- 하나라도 실패 -> rollback
+    	- 정합성이 강하지만 느리고, Coordinator 장애 시 Blocking 발생 -> 실무 적용 어려움
+    2. 3PC(Three-Phase Commit)
+    	- 2PC 문제를 해결하기 위해 timeout 기반 단계 추가
+    	- 실제 구현은 복잡하고 잘 쓰이지 않음
+    3. SAGA 패턴
+    	- 분산 트랜잭션을 작은 지역 트랜잭션들의 연속 + 보상 트랜잭션으로 처리
+    	- 방식
+    		1. Choreography(이벤트 기반)
+    		2. Orchestration(중앙 컨트롤러 기반)
+    	- MSA에 적합하고 확장성이 좋지만 개발자가 보상 트랜잭션을 구현해야 하고 복잡도가 높음
+    ```
+    
+3. 마스터, 슬레이브 데이터 동기화 전 까지의 데이터 정합성을 지키는 방법은 무엇이 있을까요?
+    
+    ```
+    1. 읽기 일관성(Read-Your-Writes) 보장
+    	- 쓰기 직후 조회는 반드시 Master에서만 조회 -> 쓰기 후 본인은 최신 데이터 읽을 수 있도록
+    2. Read Preference 설정(MongoDB, Cassandra 등)
+    	- Primary/Secondary 선택 기준을 지정
+    	- Strong Consistency가 필요한 경우 Primary로만 읽기
+    3. Write Concern / Read Concern 설정
+    4. 트랜잭션 시점 제어
+    	- MySQL semi-sync replication 사용
+    	- 최소 1 slave가 반영해야 commit
+    5. 애플리케이션 레벨 보정
+    	- Pub/Sub 기반 반영 완료 이벤트 수신 후 읽기
+    	- 캐시 무효화 전략 적용
+    ```
+    
+    - Write Concern/Read Concern
+        - Write Concern
+            
+            
+            | Write Concern | 의미 |
+            | --- | --- |
+            | `w:0` | 쓰기 결과 확인 안 함 (fire & forget) |
+            | `w:1` | Primary에만 쓰기 성공하면 ok (기본값) |
+            | `w:majority` | Primary + 과반수의 Secondary에 모두 기록되면 ok |
+            | `w:n` | n개의 노드에 쓰기되면 ok |
+            | `j:true` | Journal에 기록되기까지 기다림 (내구성 ↑) |
+            - 쓰기 안정성 수준 → 쓰기 연산이 얼마나 안전하게 저장됐다고 인정할지 결정하는 정책
+            - 서비스가 일관성 > 성능을 원할지 성능 > 일관성을 원할지 결정
+            - 강한 Write Concern의 단점
+                1. 레이턴시 증가
+                2. Secondary 노드 Sync 비용 증가
+                3. Throughput 감소
+        - Read Concern
+            
+            
+            | Read Concern | 의미 |
+            | --- | --- |
+            | `local` | Primary의 로컬 데이터(아직 복제 안 된 데이터도 포함) |
+            | `majority` | 과반수 노드에서 확인된 데이터만 읽음 |
+            | `linearizable` | 가장 강력한 일관성. 선형성 보장 |
+            | `available` | 가능한 가장 빠른 데이터를 읽음 (정합성 희생) |
+            | `snapshot` | 트랜잭션 중에는 Snapshot 기준으로 읽음 |
+            - 읽을 때 어떤 복제 상태의 데이터를 읽을지 결정하는 옵션
+4. 다중 트랜잭션 상황에서의 Deadlock 상황과 이를 해결하기 위한 방법에 대해 설명해 주세요.
+    
+    ```
+    두 트랜잭션이 서로가 가진 락을 기다리며 영원히 대기하는 상태
+    해결 방법
+    1. 트랜잭션에 동일한 순서로 락을 획득하기
+    2. 트랜잭션을 짧게 유지하기
+    3. 격리 수준 낮추기
+    4. 타임아웃 및 자동 Deadlock Detection
+    	- MySQL은 Deadlock 발생 시 자동 감지
+    5. SELECT FOR UPDATE 남발 금지
+    	- 필요한 곳에만 사용
+    ```
+    
+5. 샤딩 방식은 무엇인가요? 만약 본인이 DB를 분산해서 관리해야 한다면 레플리케이션 방식과 샤딩 방식 중 어떤 것을 사용할 것 같나요?
+    
+    ```
+    데이터를 수평적으로 나누어 여러 DB 서버에 분산 저장하는 방식
+    샤딩 기준
+    1. 해시 기반 샤딩
+    2. Range 기반 샤딩
+    3. Geo/Sharding
+    4. Consistent Hashing
+    
+    샤딩 vs 레플리케이션
+    1. 목적
+    	- 샤딩 : 데이터 용량 분산 + 쓰기 확장
+    	- 레플리케이션 : 읽기 분산 + 고가용성
+    2. 데이터
+    	- 샤딩 : 노드마다 서로 다른 데이터
+    	- 레플리케이션 : 노드마다 같은 데이터
+    3. 쓰기
+    	- 샤딩 : 여러 노드로 분산
+    	- 레플리케이션 : Master에 집중
+    4. 읽기
+    	- 샤딩 : 각 샤드로 분산
+    	- 레플리케이션 : Replica로 분산
+    5. 복잡성
+    	- 샤딩 : 높음
+    	- 레플리케이션 : 낮음
+    6. 트랜잭션
+    	- 샤딩 : 다중 샤드 -> 복잡
+    	- 레플리케이션 : 단일 Master -> 쉬움
+    
+    선택 기준
+    1. 레플리케이션
+    	- 읽기 부하만 많다
+    	- 정합성이 중요하다
+    	- 데이터량이 아주 크지 않다
+    2. 샤딩
+    	- 용량이 매우 크다
+    	- 트래픽이 너무 크다
+    	- 데이터가 자연스럽게 분할 가능하다
+    ```
+    
+
+## 정규화
+
+1. 정규화가 무엇인가요?
+    
+    ```
+    정규화는 DB에서 데이터 중복을 줄이고 삽입/삭제/갱신 이상을 제거하기 위해 테이블을 함수 종속성에 따라 분리하는 과정
+    ```
+    
+2. 정규화를 하지 않을 경우 발생할 수 있는 이상 현상에 대해 설명해 주세요.
+    
+    ```
+    1. 삽입 이상
+    	- 일부 데이터만 저장하고 싶은데, 다른 비필수 정보까지 강제로 넣어야 저장할 수 있는 문제
+    2. 삭제 이상
+    	- 불필요한 데이터를 삭제했다가 삭제하면 안 되는 중요한 데이터까지 같이 사라지는 문제
+    3. 갱신 이상
+    	- 중복된 데이터가 여러 곳에 존재해 하나만 갱신하면 나머지가 불일치하게 되는 문제
+    ```
+    
+3. 각 정규화에 대해 그 정규화가 진행되기 전/후의 테이블 변화에 대해 설명해 주세요.
+    
+    ```
+    1. 1정규화 : 도메인이 원자값
+    	- 한 컬럼에 여러 값 불가능
+    2. 2정규화 : 부분 함수 종속 제거
+    3. 3정규화 : 이행적 함수 종속 제거
+    4. BCNF : 결정자는 반드시 후보키
+    5. 4정규화 : 다치 종속 제거
+    6. 5정규화 : 조인 종속 제거
+    ```
+    
+4. 정규화가 무조건 좋은건가요? 그렇지 않다면, 어떤 상황에서 역정규화를 하는게 좋은지 설명해 주세요.
+    
+    ```
+    정규화는 이상 현상을 제거해 데이터 품질을 높이지만 읽기 성능에서 비용이 증가
+    
+    역정규화 하는 상황
+    1. 읽기 성능을 극대화해야 할 때
+    2. JOIN이 너무 많아 성능이 크게 떨어질 때
+    3. 자주 함께 조회되는 데이터가 있을 때
+    4. 캐싱처럼 조회 중심의 정리된 데이터가 필요한 경우
+    5. 샤딩/분산 환경에서 조인을 줄여야 할 때
+    ```
+    
+
+## View
+
+1. View가 무엇이고, 언제 사용할 수 있나요?
+    
+    ```
+    실제 데이터를 저장하지 않고, SELECT 쿼리를 저장해둔 가상 테이블. View를 조회할 때마다 실제 테이블에서 데이터를 다시 읽어옴
+    
+    View를 사용하는 이유
+    1. 보안(데이터 노출 제한)
+    	- 특정 컬럼만 보여주고 싶을 때
+    	- 민감 정보를 제외시키고 싶은 경우
+    2. 복잡한 쿼리를 재사용하고 단순화
+    	- 여러 JOIN을 매번 쓰기 번거로울 때
+    3. 스키마 변경 시 애플리케이션 영향 최소화
+    	- 실제 테이블 구조가 바뀌어도 View의 스키마를 유지하면 기존 서비스가 그대로 작동할 수 있음
+    4. 논리적 레이어 분리
+    	- Raw Table이 아닌, 정제된 형태의 데이터를 제공하기 위함
+    ```
+    
+2. 그렇다면, View의 값을 수정해도 실제 테이블에는 반영되지 않나요?
+    
+    ```
+    기본적으로 View는 읽기 전용으로 대부분의 View는 INSERT/UPDATE/DELETE가 불가능
+    왜냐하면 View에는 다음이 존재할 수 있기 때문
+    1. JOIN 포함
+    2. GROUP BY, DISTINCT 포함
+    3. 집계 함수 포함
+    4. UNION 포함
+    5. Subquery 포함
+    -> 이런 경우 View는 Updatable View가 될 수 없음
+    
+    Updatable View 조건
+    1. View의 SELECT 대상이 단일 테이블일 것
+    2. 기본키 또는 해당 로우를 고유하게 식별할 수 있는 컬럼이 포함될 것
+    3. 집계, DISTINCT, UNION, GROUP BY 없어야 함
+    4. Expression(계산된 값)이 없어야 함
+    5. JOIN 포함 X
+    -> 1:1로 테이블의 특정 로우에 대한 매핑이 명확할 때만 수정 가능
+    ```
+    
+
+## Join
+
+1. DB Join이 무엇인지 설명하고, 각각의 종류에 대해 설명해 주세요.
+    
+    ```
+    Join이란 두 개 이상의 테이블을 공통 컬럼을 기준으로 결합하여 하나의 결과 집합을 만드는 연산
+    
+    Join 종류
+    1. Inner Join
+    	- 두 테이블 모두에 존재하는 행만 가져옴 -> 교집합
+    2. Left Outer Join
+    	- 왼쪽 테이블의 모든 행 + 조건이 맞는 B 테이블
+    	- B에 없으면 NULL
+    3. Right Outer Join
+    	- 오른쪽 테이블의 모든 행 + 조건이 맞는 A 테이블
+    	- A에 없으면 NULL
+    4. Full Outer Join
+    	- A의 모든 행 + B의 모든 행(양쪽 누락된 값 NULL)
+    	- MySQL에서는 지원하지 않음 -> UNION으로 구현해야 함
+    5. Cross Join
+    	- A * B Cartesian 곱
+    	- 조건 없이 모든 조합 생성
+    6. Self Join
+    	- 같은 테이블을 두 번 조인
+    ```
+    
+2. Join은 상당한 시간이 걸릴 수 있기에 내부적으로 다양한 구현 방식을 사용하고 있습니다. 그 예시에 대해 설명해 주세요.
+    
+    ```
+    1. Nested Loop Join(중첩 루프 조인)
+    	- 가장 기본적인 방식
+    	- A의 각 행마다 B를 스캔
+    	- 인덱스가 있으면 빠름 -> 소량 데이터 + 인덱스 있음 -> 가장 효율적
+    2. Hash Join
+    	- 조인 키를 기준으로 해시 테이블 생성
+    	- 대량 데이터 조인에 유리
+    	- 인덱스 필요 없음
+    3. Sort-Merge Join
+    	- 양쪽 데이터를 정렬 후 병합
+    	- 이미 인덱스 순서가 맞거나 정렬되어 있다면 빠름
+    	- 대규모 테이블 + 정렬 기반 조인 시 효과적
+    ```
+    
+3. 그렇다면 입력한 쿼리에서 어떤 구현 방식을 사용했는지 어떻게 알 수 있나요?
+    
+    ```
+    EXPLAIN/EXPLAIN ANALYZE 사용
+    ```
+    
+    - EXPLAIN으로 알 수 있는 것
+        1. 조인 방식
+        2. 인덱스 사용 여부
+        3. 접근 방식
+        4. Join Order
+        5. 비용
+        6. 필터 조건
+4. Join의 성능은 인덱스의 유무의 영향을 받나요?
+    
+    ```
+    Join은 일반적으로 A.col = B.col과 같이 수행
+    - 이때 양쪽 조인 컬럼이 인덱스가 없으면 양 테이블 모두 Full Scan -> N * M 탐색이 발생하므로 매우 느림
+    - 인덱스가 있으면 한쪽 테이블 스캔 + 인덱스 LookUp -> O(N log M)
+    - Nested Loop Join이 효율적으로 수행
+    ```
+    
+5. 3중 Join부터 동작 방식이 바뀝니다. 어떻게 동작하는지, 그 방식이 성능에 어떤 영향을 주는지 설명해 주세요.
+    
+    ```
+    1. 파싱 & 논리 계획 수립
+    	- SQL을 파싱해서 논리적 조인 트리, Selection, Projection 등으로 변환
+    2. Heuristic 최적화
+    	- Selection/Projection Push-Down
+    	- 사용 불필요한 조인 제거
+    	- 간단한 규칙으로 트리를 싸게 생긴 형태로 먼저 바꿈
+    3. 조인 순서/연산자 탐색
+    	- DP로 부분집합별 최적 플랜 구함
+    	- 각 후보 플랜마다 CBO가 비용 계산
+    4. 최종 실행 계획 선택
+    ```
+    
+    - NP-Hard
+        
+        ```sql
+        SELECT ...
+        FROM A
+        JOIN B ON ...
+        JOIN C ON ...
+        JOIN D ON ...
+        ```
+        
+        - 테이블 4개를 조인한다고 하면
+            - ((A ▷◁ B) ▷◁ C) ▷◁ D
+            - (A ▷◁ (B ▷◁ C)) ▷◁ D
+            - (B ▷◁ (A ▷◁ C)) ▷◁ D
+            - 이 외에도 많은 순서 가능
+        - 논리적 결과는 같지만 중간 결과 크기와 I/O 비용은 완전히 달라짐
+            1. 결과 행 수가 작은 조인부터 하면 중간 결과가 작아서 빠름
+            2. 행 수 많은 조인을 먼저 하면, 중간 테이블이 수백만 행이 되어 이후 조인까지 전부 느려짐
+        - 테이블이 N개일 때 가능한 조인 순서 개수가 팩토리얼로 증가
+            - 단순 순서만 고려해도 N!
+            - 조인 트리 구조까지 고려하면 수가 더 커짐
+        - 그렇기 때문에 DBMS는 쓸만한 후보만 골라서 제일 싸 보이는 계획을 선택
+            1. Heuristic
+                - 경험적으로 좋은 걸 먼저 하는 룰
+                - 완전 탐색 전 검색 공간을 대폭 줄이는 역할
+                1. Selection Push-Down(선택 연산 밀어내기)
+                    - WHERE 절 필터릴 가능한 빨리 적용해 행 수를 줄임
+                2. Projection Push-Down(컬럼 줄이기)
+                    - 필요 없는 컬럼은 최대한 일찍 제거
+                3. Join Order 기본 전략
+                    - 선택도가 높은(많이 걸러내는) 조건이 붙은 테이블을 먼저 Join
+                4. 구조 제약
+                    - 완전한 모든 형태의 트리를 허용하지 않고 Left-Deep Tree(왼쪽만 계속 확장하는 트리)만 허용하거나 Bushy Tree(양쪽으로 복잡한 구조)는 안보는 등
+            2. Dynamic Programming(Selinger 알고리즘)
+                - 테이블 전체를 한 번에 최적화하지 말고, 부분 집합부터 최적 계획을 구해놓고, 점점 더 큰 집합의 최적 계획을 만듦
+                - 예시
+                    1. 단일 테이블에 대한 최적 계획을 구함
+                        - A, B, C, D 각각에 대해 인덱스 스캔/풀 스캔 중 싼 방식 선택
+                    2. 2개 테이블 조합에 대한 최적 조인 계획
+                        - 각 조합마다 Nested Loop/Hash Join/Merge Join 등 후보들에 대해 비용 계산 → 최저 비용 하나 저장
+                    3. 3개 테이블 조합
+                        - 각 경우의 총 비용을 DP로 계산하고 최적 하나를 Best Plan으로 저장
+                    4. 전체 집합에 대한 최적 계획 도출
+                - 장점
+                    1. 한 번 계산한 부분 집합의 최적 계획을 재사용
+                    2. 똑같은 부분 조합을 반복해서 계산할 필요 없음
+                    3. 시간 복잡도는 여전히 지수지만, 완전 BF보다 훨씬 덜 폭발적이라 10 ~ 12개 정도는 탐색 가능
+            3. Cost-Based Optimizer
+                - 각 실행 계획의 비용을 추정해서, 가장 비용이 낮은 계획을 선택
+                - CBO가 보는 것
+                    1. 통계 정보(Statistics)
+                        - 테이블 행 수
+                        - 각 컬럼의 값 분포
+                        - 널 비율
+                        - 인덱스 Selectivity
+                        - 상관 관계 등
+                    2. 물리적 연산자(Physical Operators)
+                        - Scan : Seq Scan, Index Scan, Index Only Scan
+                        - Join : Nested Loop, Hash Join, Merge Join
+                        - Sort, Group 등
+                    3. 비용 모델
+                        - 디스크/버퍼 I/O 비용
+                        - CPU 연산 비용
+                        - 네트워크
+                        - 메모리 사용량
+                - 각 쿼리 플랜에 대해 비용 점수를 매겨 가장 낮은 비용의 계획 채택
+
+## B-Tree / B+Tree
+
+1. B-Tree와 B+Tree에 대해 설명해 주세요.
+    
+    ```
+    1. B-Tree
+    	- 모든 노드가 여러 개의 키와 자식을 가질 수 있는 균형 다진 트리
+    	- 특징
+    		- 하나의 노드에 Key + Value가 함께 저장됨
+    		- 리프/비리프 모두 데이터 저장 가능
+    		- 트리가 항상 균형 유지 -> 높이가 log N
+    	- 장점
+    		- 깊이가 얕기 때문에 디스크 접근 횟수 감소
+    		- 이진 트리보다 훨씬 큰 폭의 데이터를 처리 가능
+    2. B+Tree
+    	- B-Tree를 확장한 구조
+    	- 모든 데이터는 리프 노드에만 저장하고, 내부 노드에는 검색을 위한 Key만 저장
+    	- 특징
+    		- 리프 노드들이 Linked List로 연결
+    		- 범위 검색 O(k)로 매우 빠름
+    		- 리프를 연속적으로 스캔하기 때문에 Index Range Scan에 최적화
+    	- 장점
+    		- Range Query 좋음
+    		- 내부 노드가 Key만 들고 있어 더 많은 key를 담을 수 있음 -> 깊이가 더 얕아짐 -> 디스크 I/O 감소
+    ```
+    
+2. B+Tree가 B-Tree에 비해 반드시 좋다고 할 수 있을까요? 그렇지 않다면 어떤 단점이 있을까요?
+    
+    ```
+    B+Tree 단점
+    1. 데이터가 리프 노드에만 저장
+    	- 동일 Key를 중복 저장하는 구조가 될 수 있음 -> 내부 노드는 Key만 있지만, 실제 Row Pointer가 리프에 존재
+    2. 포인터 유지 비용 증가
+    	- 삽입/삭제 시 리프 링크 조정 필요
+    	- B-Tree보다 구조 조정 비용이 조금 더 큼
+    3. 특정 상황에서는 B-Tree가 더 적합
+    	- 단건 랜덤 검색만 자주 일어나는 경우
+    	- Range Scan이 필요 없는 상황에서는 B-Tree가 빠를 때도 있음
+    ```
+    
+3. DB에서 RBT를 사용하지 않고, B-Tree/B+Tree를 사용하는 이유가 있을까요?
+    
+    ```
+    1. RBT는 메모리 기반에 최적화된 트리이고, DB 인덱스는 디스크 페이지 단위로 읽고 씀 -> RBT처럼 깊은 트리는 디스크 랜덤 I/O가 너무 많이 발생
+    2. Range Scan 문제 : RBT는 중위 순회로 범위 조회 가능 -> 많은 랜덤 포인터 이동 필요 -> 디스크 기반에서는 매우 비효율적
+    ```
+    
+4. 오름차순으로 정렬된 인덱스가 있다고 할 때, 내림차순 정렬을 시도할 경우 성능이 어떻게 될까요? B-Tree/B+Tree의 구조를 기반으로 설명해 주세요.
+    
+    ```
+    B+Tree는 정렬된 순서로 리프 노드가 연결되어 있으므로 오름차순 인덱스가 있어도 내림차순 조회는 역순으로 스캔하면 되기 때문에 성능 차이는 거의 없음
+    
+    내림차순이 느린 경우
+    1. 인덱스가 단방향 링크 구조인 DB
+    2. 인덱스가 복합 인덱스인 경우
+    	- a ASC, b ASC인 인덱스가 있다고 가정
+    	- ORDER BY a DESC, b ASC인 쿼리인 경우 느릴 수 있음
+    		- 복합 인덱스는 leading column이 정렬 방향을 결정
+    		- Mixed-Direction 정렬은 인덱스를 그대로 활용할 수 없음 -> Sort 연산이 발생
+    ```
+    
+
+## DB Locking
+
+1. DB Locking에 대해 설명해 주세요.
+    
+    ```
+    트랜잭션이 특정 데이터(행/페이지/테이블)에 접근할 때 동시에 접근하는 다른 트랜잭션으로부터 데이터 정합성을 보호하기 위해 DB가 걸어두는 동시성 제어 메커니즘
+    
+    DB Lock의 목적
+    1. Dirty Read 방지
+    2. Lost Update 방지
+    3. 동시에 같은 데이터를 갱신할 경우 충돌 방지
+    4. 트랜잭션 격리 구현
+    ```
+    
+2. Optimistic Lock/Pessimistic Lock에 대해 설명해 주세요.
+    
+    ```
+    1. Optimistic Lock(낙관적 락)
+    	- 충돌이 자주 발생하지 않을 것이라고 낙관적으로 보고 락을 걸지 않고 먼저 업데이트를 시도한 뒤 충돌이 발생했는지 확인하는 방식
+    	- 구현 방법
+    		1. version 컬럼을 둠
+    		2. UPDATE 실행 시 version 조건을 함께 비교
+    		3. 조건 불만족 시 충돌
+    2. Perssimistic Lock
+    	- 충돌이 발생할 것이라고 비관적이라고 보고 수정하려는 순간 즉시 락을 걸어 다른 트랜잭션 접근을 차단하는 방식
+    	- 특징
+    		- DB 레벨 락 사용 -> SELECT FOR UPDATE
+    		- 읽기도 중간 상태를 보여주지 않음
+    		- 강한 정합성 보장하지만 동시성 낮아짐
+    ```
+    
+    | 개념 | 락 종류 | 락이 걸리는 시점 | 충돌 처리 방식 | 누구를 막음? | 데드락 위험 | 대표 구문 |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | Optimistic Lock (낙관적 락) | 락 없음 | 업데이트 시점 | version 불일치 → 실패 → 재시도 | 아무도 안 막음 | ❌ 없음 | version 컬럼 비교 |
+    | Pessimistic Lock (비관적 락) | DB 락 사용 (대부분 Exclusive Lock) | 읽거나 수정 시 locking | 락 대기 또는 NOWAIT 오류 | 읽기/쓰기 모두 막음 | ✔ 있음 | SELECT FOR UPDATE |
+    | Shared Lock (공유락) | Shared Lock | SELECT 시점 | 충돌 없음(공유끼리는 OK) | 쓰기(UPDATE/DELETE)만 차단 | ✔ 있음 | SELECT FOR SHARE |
+    | Exclusive Lock (배타락, 베타락) | Exclusive Lock | SELECT FOR UPDATE 또는 수정 시 | 충돌 시 대기 | 읽기/쓰기 모두 차단(SELECT FOR SHARE 예외) | ✔ 높음 | SELECT FOR UPDATE |
+    | SELECT FOR SHARE | Shared Lock | SELECT 시 바로 | 쓰기 시도 → 대기 | 쓰기 차단, 읽기는 허용 | ✔ 있음 | SELECT … FOR SHARE |
+    | SELECT FOR UPDATE | Exclusive Lock | SELECT 시 바로 | 다른 락 있으면 대기 | 읽기/쓰기 모두 차단 | ✔ 있음 | SELECT … FOR UPDATE |
+3. 물리적인 Lock을 걸고, 만약 이를 수행 중인 요청에 문제가 생겨 비정상 종료되면 Lock이 절대 해제되지 않는 문제가 생길 수 있을 것 같습니다. DB는 이를 위한 해결책이 있나요? 없다면 어떻게 해결할 수 있을까요?
+    
+    ```
+    DB는 트랜잭션이 종료되면 자동으로 Lock을 해제하여 절대 Lock이 영구적으로 남아있는 상황은 허용하지 않음
+    
+    원리
+    1. 트랜잭션은 Connection에 종속적
+    	- 락은 Connection 소유
+    	- Connection이 끊기면 DB가 트랜잭션을 자동 Rollback -> 해당 트랜잭션이 잡고 있던 Lock 자동 해제
+    2. Crash Recovery 과정에서 Undo Log 실행
+    	- DB 서버가 장애로 종료되면 Undo Log를 사용해 미완료 트랜잭션을 되돌림 -> 이 과정에서 모든 락 해제
+    3. Lock Timeout/Deadlock Detection
+    	- InnoDB는 Deadlock Detection을 자동 수행
+    	- Lock이 오래 걸려 있으면 타임아웃으로 트랜잭션 중단 -> Lock 해제
+    ```
+    
+
+## 트래픽 대응 / CQRS
+
+1. 트래픽이 높아질 때, DB는 어떻게 관리 할 수 있을까요?
+    
+    ```
+    부하 대응 전략은 크게 6가지
+    1. 애플리케이션 계층에서 부하 감소
+    	- Connection Pool 최적화
+    	- N + 1 문제 제거
+    2. 쿼리/스키마/인덱스 최적화
+    	- 인덱스 설계 최적화
+    	- 불필요 JOIN 제거 등
+    3. 캐싱 계층 도입
+    4. DB 서버 Scale-Up
+    5. DB 서버 Scale-Out
+    	- Read Replication
+    	- Sharding
+    	- Partitioning
+    6. CQRS 도입
+    ```
+    
+    - CQRS(Command Query Responsibility Segregation)
+        - 읽기와 쓰기를 서로 다른 모델/계층으로 분리하는 아키텍처 패턴
+        - DB가 버티지 못하는 이유의 80%가 조회 폭주 때문
+            - 쓰기(Write)는 DB로 직행 → 정합성 최우선
+            - 읽기(Read)는 캐시/조회 전용 모델로 분리 → 성능 최우선
+            - DB를 분산하지 않고도 처리량을 올릴 수 있음
+        
+        ```
+              (Write API)
+        User ------> Command Model -------> DB
+                    (결제/송금/주문 생성 등)
+        
+              (Read API)
+        User ------> Query Model ---------> Redis / ViewDB / Search엔진
+                    (상태 조회, 목록 조회 등)
+        ```
+        
+2. DB 서버를 분산하지 않고, 트래픽을 감당할 수 있는 방법은 없을까요?
+    
+    ```
+    1. DB 서버 Scale-Up
+    2. 인덱스 튜닝/스키마 튜닝
+    3. Query 리팩터링
+    4. 캐싱
+    ```
+    
+
+## Schema
+
+1. Schema가 무엇인가요?
+    
+    ```
+    스키마란 DB의 구조, 제약조건, 관계, 도메인, 보안 규칙 등 DB가 어떻게 저장되고 사용되는지를 정의하는 논리적 설계를 의미함
+    
+    스키마는 아래를 모두 포함
+    1. 어떤 테이블이 존재하는가
+    2. 각 테이블에는 어떤 컬럼이 있고, 타입은 무엇인가
+    3. PK/FK 같은 제약 조건은 무엇인가
+    4. 도메인은 무엇인가
+    5. 테이블 간 관계는 무엇인가
+    6. 뷰, 인덱스, 트리거는 어떤 것이 있는가
+    
+    -> 스키마 = DB 전체 청사진
+    ```
+    
+2. Schema의 3계층에 대해 설명해 주세요.
+    
+    ```
+    1. 외부 스키마
+    	- 사용자 또는 애플리케이션이 보는 DB View -> 각 사용자마다 다른 세계를 보여주는 레이어
+    	- 특징
+    		- 사용자/도메인별 필요한 데이터만 보여줌
+    		- View 또는 Sub-Schema라고도 부름
+    		- 보안 목적
+    	- 예
+    		- 고객 화면에서 이름/전화번호만 보이는 View
+    2. 개념 스키마
+    	- DB 전체의 구조를 정의하는 논리적 데이터 모델
+    	- 포함되는 것
+    		- 모든 테이블 목록
+    		- 관계
+    		- 제약 조건
+    		- 도메인 정의
+    3. 내부 스키마
+    	- 데이터가 실제로 어떻게 저장되는지 정의하는 물리적 저장 구조
+    	- 포함되는 것
+    		- 파일 구조
+    		- 인덱스 구조
+    
+    3계층 스키마가 존재하는 이유
+    - 데이터 독립성
+    	- 논리적 데이터 독립성
+    		- 개념 스키마가 바뀌어도(ERD 수정) -> 애플리케이션은 영향받지 않음
+    	- 물리적 데이터 독립성
+    		- 저장 구조(Index, 페이지 구조)를 바뀌어도 -> 논리 모델은 영향받지 않음
+    ```
+    
+
+## Connection Pool
+
+1. DB의 Connection Pool에 대해 설명해 주세요.
+    
+    ```
+    DB 연결을 매번 새로 만들면 비용이 크기 때문에, 일정 개수의 DB 연결을 미리 만들어 풀에 보관해두고, 애플리케이션이 필요할 떄 꺼내쓰고 다시 반납하는 구조
+    
+    목적
+    1. DB 연결 비용 절감
+    2. DB 보호
+    	- 무한한 수의 연결을 허용하면 DB가 커넥션 폭주로 다운 -> Pool이 최대 Connection 수를 조절하여 DB에 안전한 연결만 유지
+    3. 지연시간 감소
+    	- 요청 직후 바로 DB 접근 가능
+    	- 매번 Handshake를 하지 않음
+    ```
+    
+2. DB와 Client가 Connection을 어떻게 구성하는지 설명해 주세요.
+    
+    ```
+    TCP 연결 -> (선택) SSL 핸드셰이크 -> DB 인증 -> 세션 생성 -> 애플리케이션 사용 -> 연결 종료
+    
+    1. TCP Connection 생성
+    	- Client -> DB 사이 3-Way Handshake 수행
+    	- 수백 μs ~ 수 ms
+    2. (선택) SSL/TLS Handshake
+    	- 이 과정이 TCP보다 훨씬 비쌈
+    3. DB 인증
+    4. 세션 생성
+    	- DB는 새로운 커넥션마다 아래를 초기화
+    		- 세션 ID
+    		- 트랜잭션 컨텍스트
+    		- 락 관리 구조
+    		- UDF 설정
+    		- Timezone, Character Set
+    		- Isolation Level
+    		- Temp Buffer 할당
+    	- 수 ms ~ 수십 ms
+    5. 애플리케이션 사용
+    6. 연결 종료
+    	1. 세션 회수
+    	2. 방금 진행한 트랜잭션 Clean Up
+    	3. UNDO/REDO 버퍼 해제
+    	4. TCP FIN 연결 차단
+    ```
+    
+
+## Table Scan과 실행 계획
+
+1. Table Full Scan, Index Range Scan에 대해 설명해 주세요.
+    
+    ```
+    1. Table Full Scan
+    	- 필요한 데이터를 찾기 위해 테이블의 모든 Row/Page를 처음부터 끝까지 읽는 방식
+    	- 특징
+    		- 인덱스를 사용하지 않음
+    		- Row 수가 많을수록 비용 증가
+    		- 대량 조회 시에는 오히려 효율적일 수 있음
+    	- 발생하는 경우
+    		- 인덱스 없음
+    		- WHERE 조건이 인덱스를 못 씀
+    		- 옵티마이저가 TFS가 더 빠르다고 판단
+    2. Index Range Scan
+    	- 인덱스의 B+Tree 구조를 이용해 필요한 범위만 빠르게 탐색하는 방식
+    	- 특징
+    		- B+Tree 탐색 -> O(log N)
+    		- 리프 노드부터 연속적으로 읽기
+    		- 인덱스의 선두 컬럼 조건이 필요(Left-Most Rule)
+    ```
+    
+2. 가끔 인덱스를 타는 쿼리임에도 Table Full Scan 방식으로 동작하는 경우가 있음. 왜 그럴까?
+    
+    ```
+    DB는 인덱스가 있어도 반드시 사용하지 않고, 옵티마이저가 일부러 Full Scan을 선택할 수 있음
+    1. 결과 row 수가 너무 많을 때(Selectivity가 낮을 때)
+    2. 인덱스 조건이 선두 컬럼을 사용하지 않음(Left-Most Rule 위반)
+    	- 인덱스 : (A, B) -> WHERE B = 10 -> 인덱스 사용 불가로 Full Scan
+    3. 함수/변형이 적용된 컬럼 조회
+    	- WHERE UPPER(name) = 'SSAFY" -> name에 인덱스 있어도 인덱스 사용 불가
+    4. LIKE 패턴이 선두 와일드카드일 때
+    5. 인덱스보다 Full Scan이 더 저렴하다고 판단할 때(Cost-Based Optimizer)
+    	- 테이블이 매우 작음 -> Full Scan이 더 빠름
+    	- 캐시된 페이지가 많음 -> TFS가 메모리에서 바로 해결
+    	- 통계정보가 갱신되지 않음(TTL 만료) -> 오판
+    ```
+    
+3. COUNT는 어떻게 동작하나요? COUNT(1), COUNT(*), COUNT(COLUMN)의 동작 과정에는 차이가 있나요?
+    
+    ```
+    1. COUNT(*)
+    	- 테이블의 ROW 수를 셈
+    	- NULL 포함 전부 COUNT
+    	- 가장 빠름
+    		- DB는 COUNT(*) 최적화가 잘 되어 있음
+    		- 실제 모든 컬럼을 읽지 않고 내부 메타 정보로 처리
+    2. COUNT(1)
+    	- COUNT(*)와 동일
+    	- 1이라는 상수를 Row마다 세라 -> 결국 Row 개수만 세기 때문에 동일한 실행 계획
+    	- COUNT(*)과 COUNT(1)은 성능 차이가 없음
+    3. COUNT(COLUMN)
+    	- 해당 컬럼이 NULL이 아닌 Row만 카운트
+    	- 인덱스가 있다면 인덱스만 보고 카운트할 수도 있음
+    ```
+    
+
+## SQL Injection
+
+1. SQL Injection에 대해 설명해 주세요.
+    
+    ```
+    사용자가 입력한 값을 SQL 쿼리 문자열에 그대로 포함시켜 공격자가 임의의 SQL 구문을 삽입하여 쿼리를 변조할 수 있는 취약점. 이를 통해 인증 우회, 데이터 유출 등 보안 사고로 이어질 수 있음
+    ```
+    
+2. 서버 개발 과정에서 사용하는 DB 라이브러리들은 이 문제를 어떻게 해결할까요?
+    
+    ```
+    1. PreparedStatement/Parameter Binding
+    	- 쿼리와 값을 분리
+    	- 쿼리 구조를 먼저 컴파일하고 파라미터를 단순 값으로 바인
+    2. ORM의 Parameter Binding
+    	- 내부적으로 PreparedStatement 사용
+    3. QueryBuilder(MyBatis, JOOQ 등)
+    	- XML이나 DSL 구조로 쿼리를 만들면 라이브러리가 문자열 조립을 대신 관리해서 입력값이 쿼리 구조로 들어갈 수 없음
+    4. 입력값 Escaping & 정규화 처리
+    	- DB 드라이버가 ', ", --, ; 등을 정상적인 문자열로 인코딩 -> 문자열이 더 이상 쿼리 구조를 깨지 못함
+    ```
+    
+    - PreparedStatement를 써도 SQL Injection이 발생하는 경우
+        - 개발자가 실수로 쿼리 구조 자체를 문자열로 조립하는 경우
+            1. 동적 쿼리를 문자열로 직접 만들어버린 경우
+                
+                ```sql
+                String sql = "SELECT * FROM users WHERE name = '" + userInput + "'";
+                PreparedStatement ps = con.prepareStatement(sql);
+                ```
+                
+                - PreparedStatement라도 이미 쿼리가 문자열로 안성돼 있기 때문에 SQL Injection 발생
+            2. WHERE 조건이나 ORDER BY를 문자열로 붙이는 경우
+                
+                ```sql
+                String order = request.getParameter("sort");   // "id DESC; DROP TABLE users;"
+                String sql = "SELECT * FROM user ORDER BY " + order;
+                ```
+                
+                - ORDER BY는 값을 바인딩할 수 없어서 취약점 발생
+            3. IN 절을 문자열로 구성하는 경우
+                
+                ```sql
+                String sql = "SELECT * FROM user WHERE id IN (" + ids + ")";
+                ```
+                
+            4. Native SQL을 JPA에서 문자열로 조립할 때
+                
+                ```sql
+                @Query(value = "SELECT * FROM user WHERE name='" + name + "'", nativeQuery = true)
+                ```
+                
+            5. Stored Procedure 안에서 문자열을 concat으로 동적 SQL 실행
+                
+                ```sql
+                SET @query = CONCAT('SELECT * FROM users WHERE name = ', name);
+                PREPARE stmt FROM @query;
+                EXECUTE stmt;
+                ```
+                

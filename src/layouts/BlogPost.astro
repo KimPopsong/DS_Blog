@@ -177,10 +177,38 @@ let pageTitle = `Blog | ${SITE_TITLE}`;
 				border-radius: 12px;
 				border: 1px solid var(--card-border);
 				box-shadow: var(--neon-glow);
-				margin: 2rem 0;
+				margin: 1.5rem 0;
 			}
 			.prose code {
 				font-size: 0.9em;
+			}
+			.prose ul,
+			.prose ol {
+				margin: 0.5em 0;
+				padding-left: 1.5rem;
+			}
+			.prose li {
+				margin-bottom: 0.35em;
+				line-height: 1.7;
+			}
+			.prose li:last-child {
+				margin-bottom: 0;
+			}
+			.prose li > ul,
+			.prose li > ol {
+				margin: 0.35em 0;
+			}
+			.prose li > p {
+				margin: 0.35em 0;
+			}
+			.prose li > p:first-child {
+				margin-top: 0;
+			}
+			.prose li > p:last-child {
+				margin-bottom: 0;
+			}
+			.prose li img {
+				margin: 0.75rem 0;
 			}
 			@media (max-width: 1024px) {
 				main {

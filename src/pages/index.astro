@@ -1,6 +1,7 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
+import GithubActivity from '../components/GithubActivity.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 ---
@@ -80,6 +81,14 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				0%, 100% { opacity: 1; }
 				50% { opacity: 0; }
 			}
+			.activity-card {
+				max-width: 780px;
+				margin: 0 auto 5rem auto;
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 8px;
+				padding: 1.75rem;
+			}
 			.features-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -136,6 +145,10 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				.feature-card {
 					padding: 1.5rem;
 				}
+				.activity-card {
+					padding: 1.25rem;
+					margin-bottom: 3.5rem;
+				}
 			}
 		</style>
 	</head>
@@ -159,6 +172,9 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 						</p>
 					</div>
 				</div>
+			</div>
+			<div class="activity-card">
+				<GithubActivity username="KimPopsong" />
 			</div>
 			<div class="features-grid">
 				<div class="feature-card">

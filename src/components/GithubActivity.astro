@@ -1,0 +1,114 @@
+---
+interface Props {
+	username: string;
+}
+
+const { username } = Astro.props;
+---
+
+<div class="github-activity" id="github-activity">
+	<p class="line"><span class="prompt">$</span>cat contributions.log</p>
+	<div class="graph-scroll">
+		<div class="graph" id="gh-graph"></div>
+	</div>
+	<p class="summary" id="gh-summary">불러오는 중…</p>
+</div>
+
+<style>
+	.github-activity {
+		font-family: var(--font-mono);
+	}
+	.line {
+		margin: 0 0 0.9rem 0;
+		font-size: 0.98rem;
+	}
+	.prompt {
+		color: var(--accent);
+		margin-right: 0.6em;
+	}
+	.graph-scroll {
+		overflow-x: auto;
+		padding-bottom: 0.25rem;
+		min-height: 90px;
+	}
+	.graph {
+		display: flex;
+		gap: 3px;
+		width: max-content;
+		margin: 0 auto;
+	}
+	.graph :global(.week) {
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+	}
+	.graph :global(.cell) {
+		width: 10px;
+		height: 10px;
+		border-radius: 2px;
+		background: rgba(255, 255, 255, 0.06);
+	}
+	.summary {
+		margin: 0.9rem 0 0 0;
+		font-size: 0.82rem;
+		color: rgb(var(--gray));
+	}
+	@media (max-width: 720px) {
+		.graph :global(.cell) {
+			width: 8px;
+			height: 8px;
+		}
+	}
+</style>
+
+<script define:vars={{ username }}>
+	(async () => {
+		const graphEl = document.getElementById('gh-graph');
+		const summaryEl = document.getElementById('gh-summary');
+		if (!graphEl || !summaryEl) return;
+
+		const levelBg = [
+			'rgba(255, 255, 255, 0.06)',
+			'rgba(242, 169, 59, 0.35)',
+			'rgba(242, 169, 59, 0.55)',
+			'rgba(242, 169, 59, 0.78)',
+			'#f2a93b',
+		];
+
+		try {
+			const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=last`);
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const data = await res.json();
+			const contributions = data.contributions;
+			const total = data.total?.lastYear ?? 0;
+
+			if (!contributions || contributions.length === 0) throw new Error('empty');
+
+			const startDay = new Date(`${contributions[0].date}T00:00:00`).getDay();
+			const padded = [...Array(startDay).fill(null), ...contributions];
+			while (padded.length % 7 !== 0) padded.push(null);
+
+			const frag = document.createDocumentFragment();
+			for (let i = 0; i < padded.length; i += 7) {
+				const week = document.createElement('div');
+				week.className = 'week';
+				for (const day of padded.slice(i, i + 7)) {
+					const cell = document.createElement('span');
+					cell.className = 'cell';
+					if (day) {
+						cell.style.background = levelBg[day.level] ?? levelBg[0];
+						cell.title = `${day.date} · ${day.count}건`;
+					} else {
+						cell.style.background = 'transparent';
+					}
+					week.appendChild(cell);
+				}
+				frag.appendChild(week);
+			}
+			graphEl.appendChild(frag);
+			summaryEl.textContent = `지난 1년간 ${total.toLocaleString()}건의 커밋을 기록했습니다.`;
+		} catch {
+			summaryEl.textContent = '-bash: contributions.log: 불러오지 못했습니다';
+		}
+	})();
+</script>

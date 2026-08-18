@@ -82,14 +82,19 @@ const totalPages = Math.ceil(otherPosts.length / POSTS_PER_PAGE);
 				width: 100%;
 				padding: 4em 2em;
 			}
+			.page-eyebrow {
+				display: block;
+				text-align: center;
+				font-family: var(--font-mono);
+				font-size: 0.9rem;
+				color: var(--accent);
+				margin-bottom: 0.75rem;
+			}
 			.page-title {
-				font-size: 3.5rem;
-				font-weight: 700;
+				font-size: 2.5rem;
+				font-weight: 600;
 				margin-bottom: 0.5em;
-				background: linear-gradient(135deg, rgb(var(--black)) 0%, var(--accent-glow) 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
+				color: rgb(var(--black));
 				text-align: center;
 			}
 			.posts-container {
@@ -140,7 +145,6 @@ const totalPages = Math.ceil(otherPosts.length / POSTS_PER_PAGE);
 			.search-select:focus {
 				outline: none;
 				border-color: var(--accent);
-				box-shadow: var(--neon-glow);
 			}
 			.search-input {
 				padding: 0.75rem 1rem;
@@ -150,34 +154,30 @@ const totalPages = Math.ceil(otherPosts.length / POSTS_PER_PAGE);
 				color: rgb(var(--black));
 				font-size: 0.95rem;
 				width: 300px;
-				transition: all 0.3s ease;
+				transition: border-color 0.2s ease;
 			}
 			.search-input:focus {
 				outline: none;
 				border-color: var(--accent);
-				box-shadow: var(--neon-glow);
 			}
 			.search-input::placeholder {
 				color: rgb(var(--gray));
 			}
 			.search-button {
 				padding: 0.75rem 2rem;
-				background: var(--accent);
+				background: transparent;
 				border: 1px solid var(--accent);
 				border-radius: 8px;
-				color: rgb(var(--black));
+				color: var(--accent);
 				font-size: 0.95rem;
 				font-weight: 600;
+				font-family: var(--font-mono);
 				cursor: pointer;
-				transition: all 0.3s ease;
+				transition: background-color 0.2s ease, color 0.2s ease;
 			}
 			.search-button:hover {
-				background: var(--accent-glow);
-				box-shadow: var(--neon-glow);
-				transform: translateY(-2px);
-			}
-			.search-button:active {
-				transform: translateY(0);
+				background: var(--accent);
+				color: var(--bg);
 			}
 			.no-results {
 				grid-column: 1 / -1;
@@ -219,20 +219,19 @@ const totalPages = Math.ceil(otherPosts.length / POSTS_PER_PAGE);
 				border-radius: 8px;
 				color: rgb(var(--gray-dark));
 				text-decoration: none;
-				transition: all 0.3s ease;
+				transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
 				font-size: 0.95rem;
+				font-family: var(--font-mono);
 				cursor: pointer;
 			}
 			.pagination-button:hover:not(.disabled):not(.active) {
 				border-color: var(--accent);
 				color: var(--accent);
-				background: rgba(79, 140, 255, 0.1);
 			}
 			.pagination-button.active {
 				background: var(--accent);
 				border-color: var(--accent);
-				color: rgb(var(--black));
-				box-shadow: var(--neon-glow);
+				color: var(--bg);
 			}
 			.pagination-button.disabled {
 				opacity: 0.5;
@@ -244,31 +243,15 @@ const totalPages = Math.ceil(otherPosts.length / POSTS_PER_PAGE);
 				flex-direction: row;
 				background: var(--card-bg);
 				border: 1px solid var(--card-border);
-				border-radius: 16px;
+				border-radius: 8px;
 				overflow: hidden;
-				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				transition: border-color 0.2s ease, transform 0.2s ease;
 				text-decoration: none;
 				position: relative;
 			}
-			.post-card::before {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
-				background: linear-gradient(135deg, rgba(79, 140, 255, 0.1) 0%, transparent 100%);
-				opacity: 0;
-				transition: opacity 0.4s ease;
-				pointer-events: none;
-			}
 			.post-card:hover {
-				transform: translateY(-8px);
-				border-color: var(--accent);
-				box-shadow: var(--neon-glow), 0 20px 40px rgba(0, 0, 0, 0.4);
-			}
-			.post-card:hover::before {
-				opacity: 1;
+				transform: translateY(-3px);
+				border-color: var(--accent-dim);
 			}
 			.featured-card {
 				flex-direction: row;
@@ -329,14 +312,11 @@ const totalPages = Math.ceil(otherPosts.length / POSTS_PER_PAGE);
 			.post-date {
 				margin: 0 0 0.75rem 0;
 				color: rgb(var(--gray));
-				font-size: 0.85rem;
+				font-size: 0.8rem;
+				font-family: var(--font-mono);
 				display: flex;
 				align-items: center;
 				gap: 0.5rem;
-			}
-			.post-date::before {
-				content: '📅';
-				font-size: 1rem;
 			}
 			.post-tags {
 				display: flex;
@@ -347,17 +327,17 @@ const totalPages = Math.ceil(otherPosts.length / POSTS_PER_PAGE);
 			}
 			.post-tag {
 				display: inline-block;
-				padding: 0.4rem 0.8rem;
-				background: rgba(79, 140, 255, 0.1);
+				padding: 0.3rem 0.7rem;
+				background: transparent;
 				border: 1px solid var(--card-border);
-				border-radius: 6px;
+				border-radius: 4px;
 				color: var(--accent);
-				font-size: 0.85rem;
-				transition: all 0.3s ease;
+				font-size: 0.8rem;
+				font-family: var(--font-mono);
+				transition: border-color 0.2s ease;
 			}
 			.post-card:hover .post-tag {
-				background: rgba(79, 140, 255, 0.2);
-				border-color: var(--accent);
+				border-color: var(--accent-dim);
 			}
 			@media (max-width: 1024px) {
 				main {
@@ -473,6 +453,7 @@ const totalPages = Math.ceil(otherPosts.length / POSTS_PER_PAGE);
 	<body>
 		<Header />
 		<main>
+			<span class="page-eyebrow">$ ls ~/blog</span>
 			<h1 class="page-title">Blog Posts</h1>
 			<ul class="posts-container">
 				{featuredPost && (

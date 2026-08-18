@@ -82,9 +82,8 @@ if (resumeEntry) {
 			.resume-content {
 				background: var(--card-bg);
 				border: 1px solid var(--card-border);
-				border-radius: 20px;
+				border-radius: 12px;
 				padding: 4rem 4rem;
-				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
 				width: 100%;
 				box-sizing: border-box;
 				margin: 0 auto;
@@ -381,14 +380,15 @@ if (resumeEntry) {
 				gap: 1rem;
 				margin-bottom: 0;
 				padding: 0.4rem 0.75rem;
-				background: rgba(79, 140, 255, 0.03);
+				background: transparent;
 				border: 1px solid var(--card-border);
 				border-radius: 6px;
 			}
 			.resume-content :global(.skill-name) {
 				font-weight: 600;
-				color: var(--accent-glow);
-				font-size: 1rem;
+				color: rgb(var(--black));
+				font-family: var(--font-mono);
+				font-size: 0.95rem;
 				flex-shrink: 0;
 			}
 			.resume-content :global(.skill-rating) {
@@ -399,17 +399,16 @@ if (resumeEntry) {
 			}
 			.resume-content :global(.skill-rating .star) {
 				font-size: 1rem;
-				color: var(--accent);
+				color: var(--card-border);
 				line-height: 1;
 			}
 			.resume-content :global(.skill-rating .star.filled) {
-				color: var(--accent-glow);
-				text-shadow: 0 0 6px rgba(107, 163, 255, 0.4);
+				color: var(--accent);
 			}
 			.resume-content :global(.skills-description) {
 				margin-top: 1.5rem;
 				padding: 1.25rem;
-				background: rgba(79, 140, 255, 0.05);
+				background: transparent;
 				border: 1px solid var(--card-border);
 				border-radius: 8px;
 			}
@@ -440,19 +439,17 @@ if (resumeEntry) {
 			.resume-content :global(.project-card) {
 				background: var(--card-bg);
 				border: 1px solid var(--card-border);
-				border-radius: 20px;
+				border-radius: 10px;
 				overflow: hidden;
-				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
-				transition: all 0.3s ease;
+				transition: border-color 0.2s ease, transform 0.2s ease;
 				text-decoration: none;
 				color: inherit;
 				display: flex;
 				flex-direction: column;
 			}
 			.resume-content :global(.project-card:hover) {
-				transform: translateY(-5px);
-				box-shadow: var(--neon-glow), 0 25px 70px rgba(79, 140, 255, 0.3);
-				border-color: var(--accent);
+				transform: translateY(-3px);
+				border-color: var(--accent-dim);
 			}
 			.resume-content :global(.project-card-image) {
 				width: 100%;
@@ -493,24 +490,22 @@ if (resumeEntry) {
 				margin-top: 0.5rem;
 			}
 			.resume-content :global(.project-card-tag) {
-				padding: 0.25rem 0.75rem;
-				background: rgba(79, 140, 255, 0.1);
+				padding: 0.25rem 0.7rem;
+				background: transparent;
 				border: 1px solid var(--card-border);
-				border-radius: 12px;
-				font-size: 0.85rem;
+				border-radius: 4px;
+				font-size: 0.8rem;
+				font-family: var(--font-mono);
 				color: var(--accent);
 			}
 			.resume-content :global(.project-card-date) {
-				font-size: 0.85rem;
+				font-size: 0.82rem;
+				font-family: var(--font-mono);
 				color: rgb(var(--gray));
 				margin-top: 0.5rem;
 				display: flex;
 				align-items: center;
 				gap: 0.5rem;
-			}
-			.resume-content :global(.project-card-date::before) {
-				content: '📅';
-				font-size: 1rem;
 			}
 			/* 인라인 스타일이 있는 div도 지원 */
 			.resume-content :global(div[style*="display: flex"]) {
@@ -563,24 +558,20 @@ if (resumeEntry) {
 				display: flex;
 				align-items: center;
 				gap: 0.75rem;
-				padding: 1rem 2rem;
-				background: var(--accent);
+				padding: 0.9rem 1.75rem;
+				background: transparent;
 				border: 1px solid var(--accent);
-				border-radius: 12px;
-				color: rgb(var(--black));
-				font-size: 1rem;
-				font-weight: 600;
+				border-radius: 8px;
+				color: var(--accent);
+				font-family: var(--font-mono);
+				font-size: 0.95rem;
+				font-weight: 500;
 				cursor: pointer;
-				transition: all 0.3s ease;
-				box-shadow: var(--neon-glow);
+				transition: background-color 0.2s ease, color 0.2s ease;
 			}
 			.download-button:hover {
-				background: var(--accent-glow);
-				transform: translateY(-2px);
-				box-shadow: var(--neon-glow), 0 10px 30px rgba(79, 140, 255, 0.4);
-			}
-			.download-button:active {
-				transform: translateY(0);
+				background: var(--accent);
+				color: var(--bg);
 			}
 			.download-button svg {
 				flex-shrink: 0;
@@ -598,7 +589,7 @@ if (resumeEntry) {
 
 				/* body / main 리셋 */
 				body {
-					background: #0f1423 !important;
+					background: var(--bg) !important;
 					margin: 0 !important;
 					padding: 0 !important;
 				}
@@ -617,7 +608,7 @@ if (resumeEntry) {
 					padding: 0 !important;
 					width: 100% !important;
 					max-width: 100% !important;
-					background: #0f1423 !important;
+					background: var(--bg) !important;
 				}
 
 				/* 배경색·색상 강제 출력 */

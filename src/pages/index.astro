@@ -10,14 +10,6 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 	<head>
 		<BaseHead title={`Home | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
-			html, body {
-				min-height: 100vh;
-				display: flex;
-				flex-direction: column;
-			}
-			body {
-				margin: 0;
-			}
 			main {
 				max-width: 1400px;
 				width: 100%;
@@ -26,19 +18,60 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				flex: 1;
 			}
 			.hero-section {
-				text-align: center;
-				margin-bottom: 6rem;
+				margin: 0 auto 5rem auto;
+				max-width: 640px;
 			}
-			.hero-title {
-				font-size: 3rem;
-				font-weight: 700;
-				margin: 0 0 1.5rem 0;
-				line-height: 1.1;
+			.terminal-window {
+				background: var(--card-bg);
+				border: 1px solid var(--card-border);
+				border-radius: 8px;
+				overflow: hidden;
+			}
+			.terminal-titlebar {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.6rem 1rem;
+				border-bottom: 1px solid var(--card-border);
+				font-family: var(--font-mono);
+				font-size: 0.8rem;
+				color: rgb(var(--gray));
+			}
+			.terminal-titlebar .dot {
+				width: 0.55rem;
+				height: 0.55rem;
+				border-radius: 50%;
+				background: rgb(var(--gray-light));
+			}
+			.terminal-path {
+				margin-left: 0.35rem;
+			}
+			.terminal-body {
+				padding: 1.5rem 1.5rem 1.75rem 1.5rem;
+				font-family: var(--font-mono);
+				font-size: 0.98rem;
+				line-height: 1.9;
+			}
+			.line {
+				margin: 0;
+				white-space: pre-wrap;
+			}
+			.prompt {
+				color: var(--accent);
+				margin-right: 0.6em;
+			}
+			.output {
 				color: rgb(var(--black));
-				font-family: 'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR','Segoe UI','Roboto','Helvetica Neue',Arial,sans-serif;
-				white-space: nowrap;
+				margin-bottom: 0.9em;
 			}
-			.typing-text {}
+			.output a {
+				color: rgb(var(--gray-dark));
+				border-bottom: 1px solid var(--card-border);
+			}
+			.output a:hover {
+				color: var(--accent);
+				border-bottom-color: var(--accent);
+			}
 			.cursor-blink {
 				animation: blink 1s step-end infinite;
 				color: var(--accent);
@@ -47,74 +80,42 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				0%, 100% { opacity: 1; }
 				50% { opacity: 0; }
 			}
-			.hero-subtitle {
-				font-size: 1.5rem;
-				color: rgb(var(--gray-dark));
-				margin-bottom: 3rem;
-				line-height: 1.6;
-			}
-			.tech-stack {
-				color: var(--accent);
-				font-weight: 600;
-				font-size: 1.2rem;
-			}
-			.cta-button {
-				display: inline-block;
-				padding: 1.2rem 3rem;
-				background: var(--card-bg);
-				border: 2px solid var(--accent);
-				border-radius: 12px;
-				color: var(--accent);
-				text-decoration: none;
-				font-weight: 600;
-				font-size: 1.1rem;
-				transition: all 0.3s ease;
-				box-shadow: var(--neon-glow);
-			}
-			.cta-button:hover {
-				background: var(--accent);
-				color: rgb(var(--black));
-				transform: translateY(-3px);
-				box-shadow: var(--neon-glow), 0 10px 30px rgba(79, 140, 255, 0.4);
-			}
 			.features-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-				gap: 2rem;
-				margin-top: 4rem;
+				grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+				gap: 1.5rem;
 			}
 			.feature-card {
 				background: var(--card-bg);
 				border: 1px solid var(--card-border);
-				border-radius: 16px;
-				padding: 2.5rem;
-				transition: all 0.3s ease;
+				border-radius: 8px;
+				padding: 1.75rem;
+				transition: border-color 0.2s ease;
 			}
 			.feature-card:hover {
-				border-color: var(--accent);
-				transform: translateY(-5px);
-				box-shadow: var(--neon-glow);
+				border-color: var(--accent-dim);
 			}
-			.feature-icon {
-				font-size: 3rem;
-				margin-bottom: 1rem;
+			.feature-eyebrow {
+				display: block;
+				font-family: var(--font-mono);
+				font-size: 0.82rem;
+				color: var(--accent);
+				margin-bottom: 0.75rem;
 			}
 			.feature-title {
-				font-size: 1.5rem;
-				margin: 0 0 1rem 0;
+				font-size: 1.15rem;
+				margin: 0 0 0.75rem 0;
 				color: rgb(var(--black));
 			}
 			.feature-description {
 				color: rgb(var(--gray-dark));
 				line-height: 1.7;
 				margin: 0;
+				font-size: 0.95rem;
 			}
 			@media (max-width: 1024px) {
 				main {
 					padding: 3em 1.5em;
-				}
-				.hero-title {
-					font-size: 2.5rem;
 				}
 			}
 			@media (max-width: 720px) {
@@ -122,49 +123,18 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 					padding: 2em 1em;
 				}
 				.hero-section {
-					margin-bottom: 4rem;
+					margin-bottom: 3.5rem;
 				}
-				.hero-title {
-					font-size: 1.8rem;
-					margin-bottom: 1rem;
-				}
-				.hero-subtitle {
-					font-size: 1.1rem;
-					margin-bottom: 2rem;
-				}
-				.cta-button {
-					padding: 1rem 2rem;
-					font-size: 1rem;
-					width: 100%;
-					text-align: center;
+				.terminal-body {
+					padding: 1.25rem 1.1rem 1.5rem 1.1rem;
+					font-size: 0.88rem;
 				}
 				.features-grid {
 					grid-template-columns: 1fr;
-					gap: 1.5rem;
-					margin-top: 3rem;
+					gap: 1.25rem;
 				}
 				.feature-card {
-					padding: 2rem 1.5rem;
-				}
-				.feature-icon {
-					font-size: 2.5rem;
-				}
-				.feature-title {
-					font-size: 1.3rem;
-				}
-			}
-			@media (max-width: 480px) {
-				main {
-					padding: 1.5em 0.75em;
-				}
-				.hero-title {
-					font-size: 1.5rem;
-				}
-				.hero-subtitle {
-					font-size: 1rem;
-				}
-				.feature-card {
-					padding: 1.5rem 1rem;
+					padding: 1.5rem;
 				}
 			}
 		</style>
@@ -173,29 +143,40 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<Header />
 		<main>
 			<div class="hero-section">
-				<h1 class="hero-title" id="typing-title"><span class="typing-prefix">&gt; </span><span class="typing-content"></span><span class="cursor-blink">_</span></h1>
-				<p class="hero-subtitle">
-					안정성을 고려한 코드로 사용자 경험과 서비스 신뢰성을 최우선으로 합니다.<br />
-				</p>
-				<a href="/blog" class="cta-button">블로그 보기 →</a>
+				<div class="terminal-window">
+					<div class="terminal-titlebar">
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="terminal-path">~/dskim</span>
+					</div>
+					<div class="terminal-body">
+						<p class="line"><span class="prompt">$</span>whoami</p>
+						<p class="line output" id="typing-line"><span class="typing-content"></span><span class="cursor-blink">_</span></p>
+						<p class="line"><span class="prompt">$</span>ls</p>
+						<p class="line output">
+							<a href="/blog">blog/</a>&nbsp;&nbsp;<a href="/project">project/</a>&nbsp;&nbsp;<a href="/resume">resume/</a>
+						</p>
+					</div>
+				</div>
 			</div>
 			<div class="features-grid">
 				<div class="feature-card">
-					<div class="feature-icon">📚</div>
+					<span class="feature-eyebrow">// learning</span>
 					<h2 class="feature-title">학습 기록</h2>
 					<p class="feature-description">
 						백엔드 기술에 대한 학습 내용을 정리하고 기록합니다.
 					</p>
 				</div>
 				<div class="feature-card">
-					<div class="feature-icon">💡</div>
+					<span class="feature-eyebrow">// retrospective</span>
 					<h2 class="feature-title">프로젝트 회고</h2>
 					<p class="feature-description">
 						프로젝트를 진행하며 겪은 경험과 배운 점을 회고합니다. 성공과 실패 모두 의미 있는 학습입니다.
 					</p>
 				</div>
 				<div class="feature-card">
-					<div class="feature-icon">🔧</div>
+					<span class="feature-eyebrow">// troubleshooting</span>
 					<h2 class="feature-title">트러블슈팅</h2>
 					<p class="feature-description">
 						개발 중 마주친 문제들과 해결 과정을 기록합니다. 같은 문제를 겪는 분들에게 도움이 되길 바랍니다.
@@ -205,10 +186,10 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		</main>
 		<script>
 			document.addEventListener('DOMContentLoaded', () => {
-				const contentEl = document.querySelector('#typing-title .typing-content');
+				const contentEl = document.querySelector('#typing-line .typing-content');
 				if (!contentEl) return;
-				const fullText = '백엔드 개발자 김대성입니다.';
-				const typingDelayMs = 80;
+				const fullText = '김대성 — Backend Developer';
+				const typingDelayMs = 70;
 				const restartDelayMs = 3000;
 				let index = 0;
 				function typeNext() {

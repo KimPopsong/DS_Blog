@@ -47,7 +47,7 @@ let pageTitle = `Blog | ${SITE_TITLE}`;
 				left: 0;
 				right: 0;
 				height: 200px;
-				background: linear-gradient(to top, #050814 0%, transparent 100%);
+				background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
 				pointer-events: none;
 			}
 			.hero-image img {
@@ -62,21 +62,17 @@ let pageTitle = `Blog | ${SITE_TITLE}`;
 				text-align: center;
 				background: var(--card-bg);
 				border: 1px solid var(--card-border);
-				border-radius: 20px;
+				border-radius: 12px;
 				margin: 0;
-				box-shadow: var(--neon-glow), 0 20px 60px rgba(0, 0, 0, 0.5);
 			}
 			.hero-section + .article-header {
 				margin: -4rem 0 0 0;
 			}
 			.article-title {
 				margin: 0 0 1.5rem 0;
-				font-size: 3.5rem;
-				line-height: 1.2;
-				background: linear-gradient(135deg, rgb(var(--black)) 0%, var(--accent-glow) 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
+				font-size: 2.75rem;
+				line-height: 1.25;
+				color: rgb(var(--black));
 			}
 			.article-meta {
 				display: flex;
@@ -93,24 +89,21 @@ let pageTitle = `Blog | ${SITE_TITLE}`;
 			}
 			.article-tag {
 				display: inline-block;
-				padding: 0.4rem 0.8rem;
-				background: rgba(79, 140, 255, 0.1);
+				padding: 0.35rem 0.75rem;
+				background: transparent;
 				border: 1px solid var(--card-border);
-				border-radius: 6px;
+				border-radius: 4px;
 				color: var(--accent);
-				font-size: 0.85rem;
-				transition: all 0.3s ease;
+				font-family: var(--font-mono);
+				font-size: 0.82rem;
 			}
 			.date {
-				color: var(--accent);
-				font-size: 0.95rem;
+				color: rgb(var(--gray));
+				font-family: var(--font-mono);
+				font-size: 0.9rem;
 				display: flex;
 				align-items: center;
 				gap: 0.5rem;
-			}
-			.date::before {
-				content: '📅';
-				font-size: 1.1rem;
 			}
 			.last-updated-on {
 				color: rgb(var(--gray));
@@ -128,20 +121,19 @@ let pageTitle = `Blog | ${SITE_TITLE}`;
 				align-items: center;
 				gap: 0.5rem;
 				padding: 0.5rem 1rem;
-				background: rgba(79, 140, 255, 0.1);
+				background: transparent;
 				border: 1px solid var(--card-border);
-				border-radius: 8px;
+				border-radius: 6px;
 				color: var(--accent);
 				text-decoration: none;
-				font-size: 0.9rem;
-				transition: all 0.3s ease;
+				font-family: var(--font-mono);
+				font-size: 0.88rem;
+				transition: background-color 0.2s ease, color 0.2s ease;
 			}
 			.project-link:hover {
 				background: var(--accent);
-				color: rgb(var(--black));
+				color: var(--bg);
 				border-color: var(--accent);
-				transform: translateY(-2px);
-				box-shadow: var(--neon-glow);
 			}
 			.project-link svg {
 				flex-shrink: 0;
@@ -151,11 +143,12 @@ let pageTitle = `Blog | ${SITE_TITLE}`;
 				align-items: center;
 				gap: 0.5rem;
 				padding: 0.5rem 1rem;
-				background: rgba(79, 140, 255, 0.05);
+				background: transparent;
 				border: 1px solid var(--card-border);
-				border-radius: 8px;
+				border-radius: 6px;
 				color: rgb(var(--gray-dark));
-				font-size: 0.9rem;
+				font-family: var(--font-mono);
+				font-size: 0.88rem;
 			}
 			.prose {
 				max-width: 100%;
@@ -174,9 +167,8 @@ let pageTitle = `Blog | ${SITE_TITLE}`;
 				color: var(--accent-glow);
 			}
 			.prose img {
-				border-radius: 12px;
+				border-radius: 6px;
 				border: 1px solid var(--card-border);
-				box-shadow: var(--neon-glow);
 				margin: 1.5rem 0;
 			}
 			.prose code {
@@ -349,7 +341,7 @@ let pageTitle = `Blog | ${SITE_TITLE}`;
 								)}
 								{teamSize && (
 									<div class="project-team-size">
-										👥 {teamSize}
+										team: {teamSize}
 									</div>
 								)}
 							</div>
